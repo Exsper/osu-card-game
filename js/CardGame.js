@@ -308,9 +308,9 @@ class CardGame {
         const enemyStats = this.calculateTotalStats(enemyCards);
 
         // 检查是否暴击（所有属性都高于对手）
-        const isCritical = playerStats.aim > enemyStats.aim &&
-            playerStats.spd > enemyStats.spd &&
-            playerStats.acc > enemyStats.acc;
+        let isCritical = false;
+        if (playerStats.aim > enemyStats.aim && playerStats.spd > enemyStats.spd && playerStats.acc > enemyStats.acc) isCritical = true;
+        if (playerStats.aim < enemyStats.aim && playerStats.spd < enemyStats.spd && playerStats.acc < enemyStats.acc) isCritical = true;
 
         // 找出双方最高属性
         const playerMax = Math.max(playerStats.aim, playerStats.spd, playerStats.acc);
