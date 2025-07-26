@@ -111,82 +111,13 @@ class CardGame {
 
         for (let i = 0; i < this.deckCount; i++) {
             // 卡牌生成策略
-            let card;
-            const cardType = Math.random();
+            let card = new Card(i + 1);
 
-            // 60% 偏科型卡牌 (一个属性极高)
-            if (cardType < 0.6) {
-                card = this.generateSpecializedCard();
-            }
-            // 30% 平衡型卡牌 (属性分布均衡)
-            else if (cardType < 0.9) {
-                card = this.generateBalancedCard();
-            }
-            // 10% 双高型卡牌 (两个属性高，一个低)
-            else {
-                card = this.generateDoubleHighCard();
-            }
-
-            card.id = i;
-            card.mod = mods[Math.floor(Math.random() * mods.length)];
             this.baseDeck.push(card);
         }
     }
 
-    generateSpecializedCard() {
-        const attributes = ['aim', 'spd', 'acc'];
-        const specializedAttr = attributes[Math.floor(Math.random() * 3)];
-        const otherAttrs = attributes.filter(attr => attr !== specializedAttr);
 
-        // 主要属性值 (8-10)
-        const highValue = Math.floor(Math.random() * 3) + 8;
-
-        // 其他两个属性值 (1-5)
-        const lowValue1 = Math.floor(Math.random() * 5) + 1;
-        const lowValue2 = Math.floor(Math.random() * 5) + 1;
-
-        return {
-            [specializedAttr]: highValue,
-            [otherAttrs[0]]: lowValue1,
-            [otherAttrs[1]]: lowValue2
-        };
-    }
-
-    generateBalancedCard() {
-        // 基础值 (3-6)
-        const baseValue = Math.floor(Math.random() * 4) + 3;
-
-        // 各属性在基础值上波动 (-2到+2)
-        const aim = baseValue + Math.floor(Math.random() * 5) - 2;
-        const spd = baseValue + Math.floor(Math.random() * 5) - 2;
-        const acc = baseValue + Math.floor(Math.random() * 5) - 2;
-
-        // 确保属性在1-10范围内
-        return {
-            aim: Math.min(10, Math.max(1, aim)),
-            spd: Math.min(10, Math.max(1, spd)),
-            acc: Math.min(10, Math.max(1, acc))
-        };
-    }
-
-    generateDoubleHighCard() {
-        const attributes = ['aim', 'spd', 'acc'];
-        const lowAttr = attributes[Math.floor(Math.random() * 3)];
-        const highAttrs = attributes.filter(attr => attr !== lowAttr);
-
-        // 两个高属性 (6-9)
-        const highValue1 = Math.floor(Math.random() * 4) + 6;
-        const highValue2 = Math.floor(Math.random() * 4) + 6;
-
-        // 低属性 (1-7)
-        const lowValue = Math.floor(Math.random() * 7) + 1;
-
-        return {
-            [highAttrs[0]]: highValue1,
-            [highAttrs[1]]: highValue2,
-            [lowAttr]: lowValue
-        };
-    }
 
     drawInitialCards() {
         this.playerHand = [];
