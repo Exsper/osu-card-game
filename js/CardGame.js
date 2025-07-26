@@ -55,6 +55,12 @@ class CardGame {
         // 随机环境MOD
         this.setRandomMod();
 
+        // 清空战斗结果
+        this.playerPlayedEl.innerHTML = '';
+        this.enemyPlayedEl.innerHTML = '';
+        this.battleResult.textContent = '等待开始...';
+        this.criticalIndicator.innerHTML = '';
+
         // 更新UI
         this.updateUI();
     }
@@ -132,7 +138,7 @@ class CardGame {
                                 <span class="stat-value">?</span>
                             </div>
                         </div>
-                        <div class="card-footer">点击查看详情</div>
+                        <div class="card-footer">隐藏卡牌</div>
                     `;
             this.enemyHandEl.appendChild(cardEl);
         });
@@ -231,6 +237,9 @@ class CardGame {
         // 清空选择
         this.selectedCards = [];
         this.playBtn.disabled = true;
+
+        // 显示下一回合按钮
+        this.endTurnBtn.disabled = false;
     }
 
     enemyAI() {
@@ -422,6 +431,8 @@ class CardGame {
     }
 
     endTurn() {
+        this.endTurnBtn.disabled = true;
+        
         if (this.gameOver) return;
 
         // 进入下一回合
@@ -502,5 +513,6 @@ class CardGame {
         this.playBtn.textContent = this.isTB ?
             `出牌 (选择1-4张)` :
             `出牌 (选择1-3张)`;
+        this.endTurnBtn.disabled = true;
     }
 }

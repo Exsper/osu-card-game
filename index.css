@@ -171,6 +171,10 @@ h1 {
     background: rgba(0, 0, 0, 0.3);
 }
 
+.card-mod.highlight {
+    background: #ffa502;
+}
+
 .card-stats {
     display: flex;
     flex-direction: column;
