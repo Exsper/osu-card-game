@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>osu! 卡牌对战（预览版）</title>
+    <link href="./index.css" rel="stylesheet">
+    <script src="./js/CardGame.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>osu! 卡牌对战（预览版）</h1>
+            <p>欢迎完善</p>
+        </header>
+        
+        <div class="game-info">
+            <div class="player-info">
+                <h2>玩家</h2>
+                <div class="health">生命值: <span id="player-health">5</span>/5</div>
+                <div class="health-bar">
+                    <div class="health-fill" id="player-health-bar" style="width: 100%"></div>
+                </div>
+            </div>
+            
+            <div class="round-info">
+                <h2>回合 <span id="round-number">1</span></h2>
+                <div>卡牌剩余: <span id="cards-left">24</span></div>
+            </div>
+            
+            <div class="enemy-info">
+                <h2>电脑</h2>
+                <div class="health">生命值: <span id="enemy-health">5</span>/5</div>
+                <div class="health-bar">
+                    <div class="health-fill" id="enemy-health-bar" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mod-indicator" id="mod-indicator">
+            当前环境: NM (无MOD)
+        </div>
+        
+        <div class="battle-area">
+            <div class="player-area">
+                <h3 class="area-title">你的手牌</h3>
+                <div class="card-container" id="player-hand"></div>
+            </div>
+            
+            <div class="enemy-area">
+                <h3 class="area-title">电脑手牌</h3>
+                <div class="card-container" id="enemy-hand"></div>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <button id="play-btn" disabled>出牌 (选择1-3张)</button>
+            <button id="end-turn-btn">结束回合</button>
+            <button id="restart-btn">重新开始</button>
+        </div>
+        
+        <div class="result-area">
+            <div class="result-title">回合结果</div>
+            <div class="result-content">
+                <div class="result-card">
+                    <h3>玩家出牌</h3>
+                    <div id="player-played"></div>
+                </div>
+                <div class="result-card">
+                    <h3>电脑出牌</h3>
+                    <div id="enemy-played"></div>
+                </div>
+                <div class="result-card">
+                    <h3>战斗结果</h3>
+                    <div id="battle-result">等待开始...</div>
+                    <div id="critical-indicator"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>游戏规则</h3>
+            <ul>
+                <li>每回合开始时，战场会随机选择一个环境MOD (NM, HR, EZ, DT, HD)</li>
+                <li>当卡牌的MOD与环境MOD匹配时，该卡牌所有属性值x1.2</li>
+                <li>每回合新增2张卡牌，你可以选择1-3张卡牌出战</li>
+                <li>比较双方出牌中最高的一项属性 (aim, spd, acc)</li>
+                <li>如果平局，则比较第二高的属性，再次平局则比较第三属性</li>
+                <li>失败方失去1点生命值，如果三个属性全部大于对手，则造成2点伤害（暴击）</li>
+                <li>当双方都只剩1点生命时，进入TB决斗，可以出最多4张卡牌</li>
+                <li>生命值先归零的一方失败</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // 初始化游戏
+        document.addEventListener('DOMContentLoaded', () => {
+            const game = new CardGame();
+        });
+    </script>
+</body>
+</html>

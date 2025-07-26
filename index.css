@@ -1,0 +1,331 @@
+:root {
+    --primary: #ff66aa;
+    --secondary: #3366cc;
+    --dark: #2c2c54;
+    --light: #f7f7f7;
+    --danger: #ff4757;
+    --success: #2ed573;
+    --warning: #ffa502;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    color: white;
+    min-height: 100vh;
+    padding: 20px;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    padding: 20px 0;
+    margin-bottom: 30px;
+}
+
+h1 {
+    font-size: 3rem;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 10px rgba(255, 102, 170, 0.3);
+    margin-bottom: 10px;
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.player-info,
+.enemy-info {
+    text-align: center;
+    padding: 15px;
+    border-radius: 8px;
+    min-width: 200px;
+}
+
+.player-info {
+    background: rgba(51, 102, 204, 0.2);
+}
+
+.enemy-info {
+    background: rgba(255, 102, 170, 0.2);
+}
+
+.health-bar {
+    height: 20px;
+    background: #444;
+    border-radius: 10px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.health-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--danger), var(--success));
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+.battle-area {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    gap: 20px;
+}
+
+.player-area,
+.enemy-area {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.area-title {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+.mod-indicator {
+    text-align: center;
+    font-size: 1.8rem;
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 2px;
+    animation: pulse 2s infinite;
+}
+
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.card {
+    width: 150px;
+    height: 200px;
+    background: linear-gradient(135deg, #3d5afe, #7c4dff);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+.card.selected {
+    transform: translateY(-15px);
+    box-shadow: 0 0 20px var(--primary);
+    border: 2px solid var(--primary);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-mod {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.card-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.stat {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+.stat-name {
+    font-weight: bold;
+}
+
+.stat-value {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.card-footer {
+    text-align: center;
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+button {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.result-area {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 30px;
+    min-height: 100px;
+}
+
+.result-title {
+    text-align: center;
+    margin-bottom: 15px;
+    color: var(--warning);
+    font-size: 1.4rem;
+}
+
+.result-content {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.result-card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 10px;
+    min-width: 200px;
+}
+
+.critical-hit {
+    color: var(--warning);
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-align: center;
+    margin-top: 10px;
+    animation: blink 1s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 102, 170, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 15px rgba(255, 102, 170, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 102, 170, 0);
+    }
+}
+
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.instructions {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 30px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.instructions h3 {
+    margin-bottom: 10px;
+    color: var(--primary);
+}
+
+.instructions ul {
+    padding-left: 20px;
+}
+
+.instructions li {
+    margin-bottom: 8px;
+}
+
+@media (max-width: 768px) {
+    .battle-area {
+        flex-direction: column;
+    }
+
+    .card {
+        width: 130px;
+        height: 180px;
+    }
+}
