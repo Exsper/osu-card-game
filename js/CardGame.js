@@ -42,6 +42,8 @@ class CardGame {
         this.enemyPlayedEl = document.getElementById('enemy-played');
         this.battleResult = document.getElementById('battle-result');
         this.criticalIndicator = document.getElementById('critical-indicator');
+        this.battleOutcome = document.getElementById('battle-outcome');
+        this.comparisonDetail = document.getElementById('comparison-detail');
 
         // 获取技能卡片元素
         this.skill1 = document.getElementById('skill1');
@@ -81,6 +83,7 @@ class CardGame {
             steal: false
         };
         this.stealMode = false;
+        this.revealedEnemyCards = [];
 
         // 创建共享牌库（基础牌库）
         this.createBaseDeck();
@@ -98,7 +101,7 @@ class CardGame {
         // 清空战斗结果
         this.playerPlayedEl.innerHTML = '';
         this.enemyPlayedEl.innerHTML = '';
-        this.battleResult.textContent = '等待开始...';
+        this.battleOutcome.textContent = '等待开始...';
         this.criticalIndicator.innerHTML = '';
 
         // 更新UI
@@ -435,9 +438,9 @@ class CardGame {
         // 找出最大值
         const maxValue = Math.max(stats.aim, stats.spd, stats.acc);
         let result = `
-        <div>Aim=${stats.aim}${stats.aim === maxValue ? '（最高）' : ''}</div>
-        <div>Spd=${stats.spd}${stats.spd === maxValue ? '（最高）' : ''}</div>
-        <div>Acc=${stats.acc}${stats.acc === maxValue ? '（最高）' : ''}</div>
+        <div class='result-sum'>Aim=${stats.aim}${stats.aim === maxValue ? '（最高）' : ''}</div>
+        <div class='result-sum'>Spd=${stats.spd}${stats.spd === maxValue ? '（最高）' : ''}</div>
+        <div class='result-sum'>Acc=${stats.acc}${stats.acc === maxValue ? '（最高）' : ''}</div>
     `;
         return result;
     }
@@ -465,6 +468,7 @@ class CardGame {
         // 构建详细比较信息
         let comparisonText = '';
         let resultText = '';
+        let outcomeClass = '';
         let damageTarget = null; // 'player' 或 'enemy'
         let damage = isCritical ? 2 : 1;
 
@@ -473,20 +477,25 @@ class CardGame {
         const enemyStatsHTML = this.formatStats(enemyStats);
 
         // 更新玩家和电脑出牌区域的属性显示
-        this.playerPlayedEl.innerHTML += playerStatsHTML;
-        this.enemyPlayedEl.innerHTML += enemyStatsHTML;
+        this.playerPlayedEl.innerHTML += '<br>' + playerStatsHTML;
+        this.enemyPlayedEl.innerHTML += '<br>' + enemyStatsHTML;
 
         // 比较最高属性
-        comparisonText = `玩家${playerMaxAttr}=${playerMax} vs 电脑${enemyMaxAttr}=${enemyMax}`;
+        comparisonText = `比较最高属性: 
+                    <span class="attribute-highlight ${playerMaxAttr.toLowerCase()}-highlight">玩家${playerMaxAttr}=${playerMax}</span> 
+                    vs 
+                    <span class="attribute-highlight ${enemyMaxAttr.toLowerCase()}-highlight">电脑${enemyMaxAttr}=${enemyMax}</span>`;
 
         if (playerMax > enemyMax) {
             resultText = "玩家获胜!";
+            outcomeClass = "player-win";
             damageTarget = 'enemy';
-            comparisonText += `<br>玩家=${playerMax} > ${enemyMax}=电脑`;
+            comparisonText += `<br><span class="result-highlight">玩家=${playerMax} > ${enemyMax}=电脑</span>`;
         } else if (playerMax < enemyMax) {
             resultText = "电脑获胜!";
+            outcomeClass = "enemy-win";
             damageTarget = 'player';
-            comparisonText += `<br>玩家=${playerMax} < ${enemyMax}=电脑`;
+            comparisonText += `<br><span class="result-highlight">玩家=${playerMax} < ${enemyMax}=电脑</span>`;
         } else {
             // 平局时比较第二高属性
             const playerSorted = [playerStats.aim, playerStats.spd, playerStats.acc].sort((a, b) => b - a);
@@ -496,27 +505,32 @@ class CardGame {
 
             if (playerSorted[1] > enemySorted[1]) {
                 resultText = "玩家获胜 (第二属性)!";
+                outcomeClass = "player-win";
                 damageTarget = 'enemy';
-                comparisonText += `<br>玩家=${playerSorted[1]} > ${enemySorted[1]}=电脑`;
+                comparisonText += `<br><span class="result-highlight">玩家=${playerSorted[1]} > ${enemySorted[1]}=电脑</span>`;
             } else if (playerSorted[1] < enemySorted[1]) {
                 resultText = "电脑获胜 (第二属性)!";
+                outcomeClass = "enemy-win";
                 damageTarget = 'player';
-                comparisonText += `<br>玩家=${playerSorted[1]} < ${enemySorted[1]}=电脑`;
+                comparisonText += `<br><span class="result-highlight">玩家=${playerSorted[1]} < ${enemySorted[1]}=电脑</span>`;
             } else {
                 // 再次平局比较第三属性
                 comparisonText += `<br>第二属性平局，比较第三属性`;
 
                 if (playerSorted[2] > enemySorted[2]) {
                     resultText = "玩家获胜 (第三属性)!";
+                    outcomeClass = "player-win";
                     damageTarget = 'enemy';
-                    comparisonText += `<br>玩家=${playerSorted[2]} > ${enemySorted[2]}=电脑`;
+                    comparisonText += `<br><span class="result-highlight">玩家=${playerSorted[2]} > ${enemySorted[2]}=电脑</span>`;
                 } else if (playerSorted[2] < enemySorted[2]) {
                     resultText = "电脑获胜 (第三属性)!";
+                    outcomeClass = "enemy-win";
                     damageTarget = 'player';
-                    comparisonText += `<br>玩家=${playerSorted[2]} < ${enemySorted[2]}=电脑`;
+                    comparisonText += `<br><span class="result-highlight">玩家=${playerSorted[2]} < ${enemySorted[2]}=电脑</span>`;
                 } else {
                     resultText = "平局!";
-                    comparisonText += `<br>第三属性也平局!`;
+                    outcomeClass = "draw-outcome";
+                    comparisonText += `<br><span class="result-highlight">第三属性也平局!</span>`;
                 }
             }
         }
@@ -528,7 +542,12 @@ class CardGame {
             this.playerHealth = Math.max(0, this.playerHealth - damage);
         }
 
-        this.battleResult.innerHTML = `<div>${resultText}</div><div class="comparison-detail">${comparisonText}</div>`;
+        // 更新战斗结果
+        this.battleOutcome.textContent = resultText;
+        this.battleOutcome.className = `battle-outcome ${outcomeClass}`;
+
+        // 更新比较详情
+        this.comparisonDetail.innerHTML = comparisonText;
 
         if (isCritical) {
             this.criticalIndicator.innerHTML = '<div class="critical-hit">暴击! 双倍伤害!</div>';
@@ -621,7 +640,8 @@ class CardGame {
         // 清空战斗结果
         this.playerPlayedEl.innerHTML = '';
         this.enemyPlayedEl.innerHTML = '';
-        this.battleResult.textContent = '等待开始...';
+        this.battleOutcome.textContent = '请出牌...';
+        this.comparisonDetail.textContent = '';
         this.criticalIndicator.innerHTML = '';
 
         // 重置已出牌状态
@@ -638,7 +658,7 @@ class CardGame {
         if (this.playerHealth <= 0 || this.enemyHealth <= 0) {
             this.gameOver = true;
             const winner = this.playerHealth <= 0 ? "电脑" : "玩家";
-            this.battleResult.textContent = `游戏结束! ${winner}获胜!`;
+            this.battleOutcome.textContent = `游戏结束! ${winner}获胜!`;
             this.playBtn.disabled = true;
         }
     }

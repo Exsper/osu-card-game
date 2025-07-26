@@ -317,6 +317,34 @@ button:disabled {
     margin-bottom: 15px;
     color: var(--warning);
     font-size: 1.4rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.battle-outcome {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.player-win {
+    color: #2ed573;
+    background: rgba(46, 213, 115, 0.1);
+}
+
+.enemy-win {
+    color: #ff4757;
+    background: rgba(255, 71, 87, 0.1);
+}
+
+.draw-outcome {
+    color: #feca57;
+    background: rgba(254, 202, 87, 0.1);
 }
 
 .result-content {
@@ -332,6 +360,11 @@ button:disabled {
     min-width: 200px;
 }
 
+.result-sum {
+    width: 100%;
+    text-align: center;
+}
+
 .critical-hit {
     color: var(--warning);
     font-weight: bold;
@@ -339,6 +372,88 @@ button:disabled {
     text-align: center;
     margin-top: 10px;
     animation: blink 1s infinite;
+}
+
+.played-cards-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.player-cards,
+.enemy-cards {
+    flex: 1;
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.cards-label {
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+.player-cards .cards-label {
+    color: #3498db;
+}
+
+.enemy-cards .cards-label {
+    color: #e74c3c;
+}
+
+.played-cards {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.comparison-detail {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+    font-size: 1.1rem;
+    text-align: center;
+    line-height: 1.6;
+}
+
+.critical-hit {
+    color: var(--warning);
+    font-weight: bold;
+    font-size: 1.3rem;
+    text-align: center;
+    margin-top: 15px;
+    animation: blink 1s infinite;
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(255, 202, 87, 0.2);
+}
+
+.attribute-highlight {
+    font-weight: bold;
+    font-size: 1.2em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin: 0 3px;
+}
+
+.aim-highlight {
+    background: rgba(255, 107, 107, 0.3);
+    color: #ff6b6b;
+}
+
+.spd-highlight {
+    background: rgba(155, 89, 182, 0.3);
+    color: #9b59b6;
+}
+
+.acc-highlight {
+    background: rgba(46, 204, 113, 0.3);
+    color: #2ecc71;
 }
 
 @keyframes pulse {
@@ -402,15 +517,6 @@ button:disabled {
     }
 }
 
-.comparison-detail {
-    margin-top: 10px;
-    padding: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 5px;
-    font-size: 0.9rem;
-    text-align: left;
-}
-
 /* 技能区域样式 */
 .skills-area {
     background: rgba(0, 0, 0, 0.3);
@@ -449,13 +555,15 @@ button:disabled {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
 }
 
-.skill-card.used, .skill-card.disabled{
+.skill-card.used,
+.skill-card.disabled {
     opacity: 0.5;
     filter: grayscale(80%);
     cursor: not-allowed;
 }
 
-.skill-card.used:hover , .skill-card.disabled:hover {
+.skill-card.used:hover,
+.skill-card.disabled:hover {
     transform: none;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
