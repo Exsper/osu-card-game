@@ -77,16 +77,83 @@ class CardGame {
         this.baseDeck = [];
         const mods = ['HR', 'EZ', 'DT', 'HD'];
 
-        for (let i = 0; i < 25; i++) {
-            const card = {
-                id: i,
-                aim: Math.floor(Math.random() * 10) + 1,
-                spd: Math.floor(Math.random() * 10) + 1,
-                acc: Math.floor(Math.random() * 10) + 1,
-                mod: mods[Math.floor(Math.random() * mods.length)]
-            };
+        for (let i = 0; i < 30; i++) {
+            // 卡牌生成策略
+            let card;
+            const cardType = Math.random();
+
+            // 60% 偏科型卡牌 (一个属性极高)
+            if (cardType < 0.6) {
+                card = this.generateSpecializedCard();
+            }
+            // 30% 平衡型卡牌 (属性分布均衡)
+            else if (cardType < 0.9) {
+                card = this.generateBalancedCard();
+            }
+            // 10% 双高型卡牌 (两个属性高，一个低)
+            else {
+                card = this.generateDoubleHighCard();
+            }
+
+            card.id = i;
+            card.mod = mods[Math.floor(Math.random() * mods.length)];
             this.baseDeck.push(card);
         }
+    }
+
+    generateSpecializedCard() {
+        const attributes = ['aim', 'spd', 'acc'];
+        const specializedAttr = attributes[Math.floor(Math.random() * 3)];
+        const otherAttrs = attributes.filter(attr => attr !== specializedAttr);
+
+        // 主要属性值 (8-10)
+        const highValue = Math.floor(Math.random() * 3) + 8;
+
+        // 其他两个属性值 (1-5)
+        const lowValue1 = Math.floor(Math.random() * 5) + 1;
+        const lowValue2 = Math.floor(Math.random() * 5) + 1;
+
+        return {
+            [specializedAttr]: highValue,
+            [otherAttrs[0]]: lowValue1,
+            [otherAttrs[1]]: lowValue2
+        };
+    }
+
+    generateBalancedCard() {
+        // 基础值 (3-6)
+        const baseValue = Math.floor(Math.random() * 4) + 3;
+
+        // 各属性在基础值上波动 (-2到+2)
+        const aim = baseValue + Math.floor(Math.random() * 5) - 2;
+        const spd = baseValue + Math.floor(Math.random() * 5) - 2;
+        const acc = baseValue + Math.floor(Math.random() * 5) - 2;
+
+        // 确保属性在1-10范围内
+        return {
+            aim: Math.min(10, Math.max(1, aim)),
+            spd: Math.min(10, Math.max(1, spd)),
+            acc: Math.min(10, Math.max(1, acc))
+        };
+    }
+
+    generateDoubleHighCard() {
+        const attributes = ['aim', 'spd', 'acc'];
+        const lowAttr = attributes[Math.floor(Math.random() * 3)];
+        const highAttrs = attributes.filter(attr => attr !== lowAttr);
+
+        // 两个高属性 (6-9)
+        const highValue1 = Math.floor(Math.random() * 4) + 6;
+        const highValue2 = Math.floor(Math.random() * 4) + 6;
+
+        // 低属性 (1-7)
+        const lowValue = Math.floor(Math.random() * 7) + 1;
+
+        return {
+            [highAttrs[0]]: highValue1,
+            [highAttrs[1]]: highValue2,
+            [lowAttr]: lowValue
+        };
     }
 
     drawInitialCards() {
@@ -193,6 +260,33 @@ class CardGame {
             }
         }
 
+        // 计算属性值
+        const aimVal = card.aim;
+        const spdVal = card.spd;
+        const accVal = card.acc;
+        const values = [aimVal, spdVal, accVal];
+        const maxValue = Math.max(...values);
+        const minValue = Math.min(...values);
+
+        // 判断卡牌类型
+        let cardType = "balanced"; // 默认平衡卡
+
+        // 检查单属性突出（偏科卡）
+        if (aimVal === maxValue && (aimVal - spdVal >= 3) && (aimVal - accVal >= 3)) {
+            cardType = "high-aim";
+        } else if (spdVal === maxValue && (spdVal - aimVal >= 3) && (spdVal - accVal >= 3)) {
+            cardType = "high-spd";
+        } else if (accVal === maxValue && (accVal - aimVal >= 3) && (accVal - spdVal >= 3)) {
+            cardType = "high-acc";
+        }
+        // 检查双高属性
+        else if (values.filter(v => v >= 7).length >= 2) {
+            cardType = "double-high";
+        }
+
+        // 添加类型类名
+        cardEl.classList.add(cardType);
+
         if (disabled) {
             cardEl.classList.add('disabled');
         }
@@ -200,6 +294,7 @@ class CardGame {
         if (isPlayer && this.selectedCards.includes(card.id)) {
             cardEl.classList.add('selected');
         }
+
         let aimValue = "";
         let spdValue = "";
         let accValue = "";

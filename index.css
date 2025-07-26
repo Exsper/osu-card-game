@@ -196,6 +196,56 @@ h1 {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
 }
 
+/* Aim高卡 - 红色边框 */
+.card.high-aim {
+    border: 2px solid #ff6b6b;
+    box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+    background: rgba(255, 107, 107, 0.3);
+}
+
+/* Spd高卡 - 紫色边框 */
+.card.high-spd {
+    border: 2px solid #9b59b6;
+    box-shadow: 0 0 10px rgba(155, 89, 182, 0.5);
+    background: rgba(155, 89, 182, 0.3);
+}
+
+/* Acc高卡 - 绿色边框 */
+.card.high-acc {
+    border: 2px solid #2ecc71;
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+    background: rgba(46, 204, 113, 0.3);
+}
+
+/* 双高卡 - 彩色渐变边框 */
+.card.double-high {
+    border: 2px solid transparent;
+    background: linear-gradient(45deg, 
+        #ff6b6b 0%, 
+        #9b59b6 50%, 
+        #2ecc71 100%);
+}
+
+.card.double-high::before {
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, 
+        #ff6b6b 0%, 
+        #9b59b6 50%, 
+        #2ecc71 100%);
+    z-index: -1;
+    border-radius: 12px;
+}
+
+/* 平衡卡 - 蓝色边框 */
+.card.balanced {
+    border: 2px solid #48dbfb;
+    box-shadow: 0 0 10px rgba(72, 219, 251, 0.5);
+    background: rgba(72, 219, 251, 0.3);
+}
+
 .stat {
     display: flex;
     justify-content: space-between;
