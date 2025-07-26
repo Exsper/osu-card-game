@@ -947,6 +947,15 @@ class CardGame {
 
             // 重新渲染双方手牌
             this.renderCards();
+
+            // 偷取后判定游戏是否结束
+            this.checkHandAndDeckIsEmpty();
+            this.updateUI();
+
+            // 如果已出牌，则自动结束回合，防止卡死
+            if (this.hasPlayed && !this.gameOver) {
+                setTimeout(() => this.endTurn(), 500); // 适当延迟，给玩家反馈
+            }
         }
     }
 }
