@@ -63,7 +63,7 @@ class CardGame {
         this.deck = [];
         const mods = ['HR', 'EZ', 'DT', 'HD'];
 
-        for (let i = 0; i < 30; i++) {
+        for (let i = 0; i < 40; i++) {
             const card = {
                 id: i,
                 aim: Math.floor(Math.random() * 10) + 1,
@@ -97,7 +97,8 @@ class CardGame {
 
     setRandomMod() {
         const mods = ['NM', 'HR', 'EZ', 'DT', 'HD'];
-        this.currentMod = mods[Math.floor(Math.random() * mods.length)];
+        if (this.isTB) this.currentMod = mods[0];
+        else this.currentMod = mods[Math.floor(Math.random() * mods.length)];
     }
 
     renderCards() {
@@ -140,7 +141,7 @@ class CardGame {
     createCardElement(card, isPlayer) {
         const cardEl = document.createElement('div');
         cardEl.className = 'card';
-        if (this.selectedCards.includes(card.id)) {
+        if (isPlayer && this.selectedCards.includes(card.id)) {
             cardEl.classList.add('selected');
         }
         let aimValue = "";
@@ -283,6 +284,17 @@ class CardGame {
         });
     }
 
+    formatStats(stats) {
+        // 找出最大值
+        const maxValue = Math.max(stats.aim, stats.spd, stats.acc);
+        let result = `
+        <div>Aim=${stats.aim}${stats.aim === maxValue ? '（最高）' : ''}</div>
+        <div>Spd=${stats.spd}${stats.spd === maxValue ? '（最高）' : ''}</div>
+        <div>Acc=${stats.acc}${stats.acc === maxValue ? '（最高）' : ''}</div>
+    `;
+        return result;
+    }
+
     calculateBattle(playerCards, enemyCards) {
         // 计算玩家属性总和（考虑MOD效果）
         const playerStats = this.calculateTotalStats(playerCards);
@@ -293,50 +305,83 @@ class CardGame {
             playerStats.spd > enemyStats.spd &&
             playerStats.acc > enemyStats.acc;
 
-        // 比较最高属性
+        // 找出双方最高属性
         const playerMax = Math.max(playerStats.aim, playerStats.spd, playerStats.acc);
         const enemyMax = Math.max(enemyStats.aim, enemyStats.spd, enemyStats.acc);
 
+        // 确定最高属性的名称
+        const playerMaxAttr = playerStats.aim === playerMax ? 'Aim' :
+            playerStats.spd === playerMax ? 'Spd' : 'Acc';
+        const enemyMaxAttr = enemyStats.aim === enemyMax ? 'Aim' :
+            enemyStats.spd === enemyMax ? 'Spd' : 'Acc';
+
+        // 构建详细比较信息
+        let comparisonText = '';
         let resultText = '';
+        let damageTarget = null; // 'player' 或 'enemy'
+        let damage = isCritical ? 2 : 1;
+
+        // 格式化属性显示
+        const playerStatsHTML = this.formatStats(playerStats);
+        const enemyStatsHTML = this.formatStats(enemyStats);
+
+        // 更新玩家和电脑出牌区域的属性显示
+        this.playerPlayedEl.innerHTML += playerStatsHTML;
+        this.enemyPlayedEl.innerHTML += enemyStatsHTML;
+
+        // 比较最高属性
+        comparisonText = `玩家${playerMaxAttr}=${playerMax} vs 电脑${enemyMaxAttr}=${enemyMax}`;
 
         if (playerMax > enemyMax) {
             resultText = "玩家获胜!";
-            const damage = isCritical ? 2 : 1;
-            this.enemyHealth = Math.max(0, this.enemyHealth - damage);
+            damageTarget = 'enemy';
+            comparisonText += `<br>玩家=${playerMax} > ${enemyMax}=电脑`;
         } else if (playerMax < enemyMax) {
             resultText = "电脑获胜!";
-            const damage = isCritical ? 2 : 1;
-            this.playerHealth = Math.max(0, this.playerHealth - damage);
+            damageTarget = 'player';
+            comparisonText += `<br>玩家=${playerMax} < ${enemyMax}=电脑`;
         } else {
             // 平局时比较第二高属性
             const playerSorted = [playerStats.aim, playerStats.spd, playerStats.acc].sort((a, b) => b - a);
             const enemySorted = [enemyStats.aim, enemyStats.spd, enemyStats.acc].sort((a, b) => b - a);
 
+            comparisonText += `<br>最高属性平局，比较第二属性`;
+
             if (playerSorted[1] > enemySorted[1]) {
                 resultText = "玩家获胜 (第二属性)!";
-                const damage = isCritical ? 2 : 1;
-                this.enemyHealth = Math.max(0, this.enemyHealth - damage);
+                damageTarget = 'enemy';
+                comparisonText += `<br>玩家=${playerSorted[1]} > ${enemySorted[1]}=电脑`;
             } else if (playerSorted[1] < enemySorted[1]) {
                 resultText = "电脑获胜 (第二属性)!";
-                const damage = isCritical ? 2 : 1;
-                this.playerHealth = Math.max(0, this.playerHealth - damage);
+                damageTarget = 'player';
+                comparisonText += `<br>玩家=${playerSorted[1]} < ${enemySorted[1]}=电脑`;
             } else {
                 // 再次平局比较第三属性
+                comparisonText += `<br>第二属性平局，比较第三属性`;
+
                 if (playerSorted[2] > enemySorted[2]) {
                     resultText = "玩家获胜 (第三属性)!";
-                    const damage = isCritical ? 2 : 1;
-                    this.enemyHealth = Math.max(0, this.enemyHealth - damage);
+                    damageTarget = 'enemy';
+                    comparisonText += `<br>玩家=${playerSorted[2]} > ${enemySorted[2]}=电脑`;
                 } else if (playerSorted[2] < enemySorted[2]) {
                     resultText = "电脑获胜 (第三属性)!";
-                    const damage = isCritical ? 2 : 1;
-                    this.playerHealth = Math.max(0, this.playerHealth - damage);
+                    damageTarget = 'player';
+                    comparisonText += `<br>玩家=${playerSorted[2]} < ${enemySorted[2]}=电脑`;
                 } else {
                     resultText = "平局!";
+                    comparisonText += `<br>第三属性也平局!`;
                 }
             }
         }
 
-        this.battleResult.textContent = resultText;
+        // 应用伤害
+        if (damageTarget === 'enemy') {
+            this.enemyHealth = Math.max(0, this.enemyHealth - damage);
+        } else if (damageTarget === 'player') {
+            this.playerHealth = Math.max(0, this.playerHealth - damage);
+        }
+
+        this.battleResult.innerHTML = `<div>${resultText}</div><div class="comparison-detail">${comparisonText}</div>`;
 
         if (isCritical) {
             this.criticalIndicator.innerHTML = '<div class="critical-hit">暴击! 双倍伤害!</div>';
@@ -358,9 +403,9 @@ class CardGame {
 
         cards.forEach(card => {
             const multiplier = (card.mod === this.currentMod) ? 1.2 : 1;
-            aim += card.aim * multiplier;
-            spd += card.spd * multiplier;
-            acc += card.acc * multiplier;
+            aim += card.aim * (multiplier * 10) / 10;
+            spd += card.spd * (multiplier * 10) / 10;
+            acc += card.acc * (multiplier * 10) / 10;
         });
 
         return { aim, spd, acc };
@@ -425,7 +470,8 @@ class CardGame {
         this.cardsLeftEl.textContent = this.deck.length;
 
         // 更新MOD指示器
-        this.modIndicator.textContent = `当前环境: ${this.currentMod} ${this.currentMod === 'NM' ? '(无MOD)' : ''}`;
+        if (this.isTB) this.modIndicator.textContent = '当前比赛: TB (无MOD)';
+        else this.modIndicator.textContent = `当前比赛: ${this.currentMod} ${this.currentMod === 'NM' ? '(无MOD)' : ''}`;
 
         // 根据MOD改变指示器颜色
         const modColors = {
