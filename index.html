@@ -58,7 +58,39 @@
             <button id="end-turn-btn">结束回合</button>
             <button id="restart-btn">重新开始</button>
         </div>
-        
+
+        <!-- 技能区域 -->
+        <div class="skills-area">
+            <h3>玩家技能（消耗1点生命值，每个技能只能使用一次）</h3>
+            <div class="skills">
+                <div class="skill-card" id="skill1" data-skill="reveal">
+                    <div class="skill-left">1</div>
+                    <div class="skill-name">侦察敌情</div>
+                    <div class="skill-desc">显示敌方当前所有手牌，并持续显示这些卡牌（新抽卡牌仍隐藏）</div>
+                </div>
+                
+                <div class="skill-card" id="skill2" data-skill="draw">
+                    <div class="skill-left">1</div>
+                    <div class="skill-name">紧急补给</div>
+                    <div class="skill-desc">额外抽取2张卡牌</div>
+                </div>
+                
+                <div class="skill-card" id="skill3" data-skill="redraw">
+                    <div class="skill-left">1</div>
+                    <div class="skill-name">重整旗鼓</div>
+                    <div class="skill-desc">丢弃所有手牌，重新抽取相同数量的卡牌</div>
+                </div>
+                
+                <div class="skill-card" id="skill4" data-skill="steal">
+                    <div class="skill-left">1</div>
+                    <div class="skill-name">妙手空空</div>
+                    <div class="skill-desc">从敌人手中偷取1张指定的卡牌</div>
+                </div>
+            </div>
+            <div class="skill-hint" id="skill-hint">生命值大于1时可以使用技能</div>
+        </div>
+
+        <!-- 回合结果区域 -->
         <div class="result-area">
             <div class="result-title">回合结果</div>
             <div class="result-content">
@@ -94,7 +126,6 @@
             </ul>
             <h3>下一步计划</h3>
             <ul>
-                <li>玩家技能</li>
                 <li>将现实玩家加入卡组，显示用户名和头像</li>
                 <li>欢迎提出任何意见和建议</li>
             </ul>

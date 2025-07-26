@@ -1,5 +1,6 @@
 class CardGame {
     constructor() {
+        this.deckCount = 25; // 每副牌的卡牌数量
         this.fullHealth = 6; // 初始生命值
         this.playerHealth = 6;
         this.enemyHealth = 6;
@@ -14,6 +15,15 @@ class CardGame {
         this.isTB = false;
         this.gameOver = false;
         this.hasPlayed = false; // 标记是否已出牌
+        // 技能系统变量
+        this.skillsUsed = {
+            reveal: false,
+            draw: false,
+            redraw: false,
+            steal: false
+        };
+        this.stealMode = false; // 是否处于偷取模式
+        this.revealedEnemyCards = []; // 被侦察显示的敌方卡牌
 
         // DOM元素引用
         this.playerHandEl = document.getElementById('player-hand');
@@ -33,10 +43,24 @@ class CardGame {
         this.battleResult = document.getElementById('battle-result');
         this.criticalIndicator = document.getElementById('critical-indicator');
 
+        // 获取技能卡片元素
+        this.skill1 = document.getElementById('skill1');
+        this.skill2 = document.getElementById('skill2');
+        this.skill3 = document.getElementById('skill3');
+        this.skill4 = document.getElementById('skill4');
+        this.skillHint = document.getElementById('skill-hint');
+
+
         // 绑定事件
         this.playBtn.addEventListener('click', () => this.playSelectedCards());
         this.endTurnBtn.addEventListener('click', () => this.endTurn());
         this.restartBtn.addEventListener('click', () => this.restartGame());
+
+        // 绑定技能事件
+        this.skill1.addEventListener('click', () => this.useSkill('reveal'));
+        this.skill2.addEventListener('click', () => this.useSkill('draw'));
+        this.skill3.addEventListener('click', () => this.useSkill('redraw'));
+        this.skill4.addEventListener('click', () => this.useSkill('steal'));
 
         // 初始化游戏
         this.initGame();
@@ -50,6 +74,13 @@ class CardGame {
         this.isTB = false;
         this.gameOver = false;
         this.hasPlayed = false;
+        this.skillsUsed = {
+            reveal: false,
+            draw: false,
+            redraw: false,
+            steal: false
+        };
+        this.stealMode = false;
 
         // 创建共享牌库（基础牌库）
         this.createBaseDeck();
@@ -78,7 +109,7 @@ class CardGame {
         this.baseDeck = [];
         const mods = ['HR', 'EZ', 'DT', 'HD'];
 
-        for (let i = 0; i < 30; i++) {
+        for (let i = 0; i < this.deckCount; i++) {
             // 卡牌生成策略
             let card;
             const cardType = Math.random();
@@ -216,7 +247,14 @@ class CardGame {
         this.enemyHand.forEach(card => {
             const cardEl = document.createElement('div');
             cardEl.className = 'card';
-            cardEl.innerHTML = `
+
+            // 侦察模式下显示的卡牌
+            if (this.revealedEnemyCards.includes(card.id)) {
+                cardEl.classList.add('revealed');
+                cardEl.innerHTML = this.createCardElement(card, false).innerHTML; // 使用createCardElement生成内容
+            }
+            else {
+                cardEl.innerHTML = `
                         <div class="card-header">
                             <div class="card-mod">隐藏</div>
                         </div>
@@ -236,17 +274,27 @@ class CardGame {
                         </div>
                         <div class="card-footer">隐藏卡牌</div>
                     `;
+            }
+            cardEl.classList.add('enemy-card');
+
+            // 偷取模式下可点击
+            if (this.stealMode) {
+                cardEl.classList.add('steal-target');
+                cardEl.addEventListener('click', () => {
+                    this.stealEnemyCard(card.id);
+                });
+            }
             this.enemyHandEl.appendChild(cardEl);
         });
     }
 
-    createCardElement(card, isPlayer) {
+    createCardElement(card, isHand) {
         const cardEl = document.createElement('div');
         cardEl.className = 'card';
 
         // 判断是否禁用
         let disabled = false;
-        if (isPlayer) {
+        if (isHand) {
             // 情况1：已出牌但未结束回合
             if (this.hasPlayed) {
                 disabled = true;
@@ -292,7 +340,7 @@ class CardGame {
             cardEl.classList.add('disabled');
         }
 
-        if (isPlayer && this.selectedCards.includes(card.id)) {
+        if (isHand && this.selectedCards.includes(card.id)) {
             cardEl.classList.add('selected');
         }
 
@@ -326,8 +374,8 @@ class CardGame {
                     <div class="card-footer">ID: ${card.id}</div>
                 `;
 
-        // 只有未禁用的卡牌才添加点击事件
-        if (isPlayer && !disabled) {
+        // 只有未禁用的玩家卡牌才添加点击事件
+        if (isHand && !disabled) {
             cardEl.addEventListener('click', () => {
                 this.toggleCardSelection(card);
             });
@@ -390,6 +438,8 @@ class CardGame {
 
         // 显示下一回合按钮
         this.endTurnBtn.disabled = false;
+
+        this.updateSkillsState();
     }
 
     enemyAI() {
@@ -580,6 +630,29 @@ class CardGame {
         return { aim, spd, acc };
     }
 
+    // 检查玩家和电脑的手牌和牌库数量，均为0时游戏结束
+    checkHandAndDeckIsEmpty() {
+        // 玩家牌库为空且手牌也为空时，若无法发动偷取技能，则游戏无法进行，判定为游戏结束
+        if (this.playerDeck.length === 0 && this.playerHand.length === 0 && (this.skillsUsed.steal === true || this.playerHealth <= 1)) {
+            this.gameOver = true;
+            this.battleResult.textContent = "游戏结束! 玩家无牌可出，电脑获胜!";
+            this.playBtn.disabled = true;
+            this.endTurnBtn.disabled = true;
+            return true;
+        }
+
+        // 电脑牌库为空且手牌也为空时判定失败
+        if (this.enemyDeck.length === 0 && this.enemyHand.length === 0) {
+            this.gameOver = true;
+            this.battleResult.textContent = "游戏结束! 电脑无牌可出，玩家获胜!";
+            this.playBtn.disabled = true;
+            this.endTurnBtn.disabled = true;
+            return true;
+        }
+
+        return false;
+    }
+
     endTurn() {
         this.endTurnBtn.disabled = true;
 
@@ -596,6 +669,12 @@ class CardGame {
                 if (playerCard !== null) this.playerHand.push(playerCard);
                 if (enemyCard !== null) this.enemyHand.push(enemyCard);
             }
+        }
+
+        // 检查玩家和电脑的手牌和牌库数量
+        if (this.checkHandAndDeckIsEmpty()) {
+            this.updateUI();
+            return;
         }
 
         // 检查是否进入TB模式
@@ -616,6 +695,9 @@ class CardGame {
 
         // 重置已出牌状态
         this.hasPlayed = false;
+
+        // 退出偷取模式
+        this.stealMode = false;
 
         // 更新UI
         this.updateUI();
@@ -669,5 +751,202 @@ class CardGame {
             `出牌 (选择1-4张)` :
             `出牌 (选择1-3张)`;
         this.endTurnBtn.disabled = true;
+
+        // 更新技能状态
+        this.updateSkillsState();
+    }
+
+    // 更新技能状态
+    updateSkillsState() {
+        // 生命值不足时禁用所有技能，出牌后也无法使用技能
+        const canUseSkills = this.playerHealth > 1 && !this.hasPlayed;
+
+        // 更新每个技能状态
+        this.skill1.classList.toggle('used', this.skillsUsed.reveal);
+        this.skill2.classList.toggle('used', this.skillsUsed.draw);
+        this.skill3.classList.toggle('used', this.skillsUsed.redraw);
+        this.skill4.classList.toggle('used', this.skillsUsed.steal);
+
+        this.skill1.classList.toggle('disabled', !canUseSkills || this.skillsUsed.reveal);
+        this.skill2.classList.toggle('disabled', !canUseSkills || this.skillsUsed.draw);
+        this.skill3.classList.toggle('disabled', !canUseSkills || this.skillsUsed.redraw);
+        this.skill4.classList.toggle('disabled', !canUseSkills || this.skillsUsed.steal);
+
+        // 更新提示
+        if (!canUseSkills) {
+            if (this.hasPlayed) this.skillHint.textContent = "等待下一回合使用技能...";
+            else this.skillHint.textContent = "生命值不足，无法使用技能！";
+        } else if (this.stealMode) {
+            this.skillHint.textContent = "请点击要偷取的敌方卡牌！";
+        } else {
+            this.skillHint.textContent = "生命值大于1时可以使用技能";
+        }
+    }
+
+    // 使用技能
+    useSkill(skillType) {
+        if (this.hasPlayed || this.gameOver) {
+            return;
+        }
+
+        if (this.playerHealth <= 1) {
+            this.skillHint.textContent = "生命值不足，无法使用技能！";
+            return;
+        }
+
+        if (this.skillsUsed[skillType]) {
+            this.skillHint.textContent = "该技能已经使用过！";
+            return;
+        }
+
+        // 判断技能使用是否成功
+        let success = false;
+        switch (skillType) {
+            case 'reveal':
+                success = this.useRevealSkill();
+                break;
+            case 'draw':
+                success = this.useDrawSkill();
+                break;
+            case 'redraw':
+                success = this.useRedrawSkill();
+                break;
+            case 'steal':
+                success = this.useStealSkill();
+                break;
+        }
+
+        if (success) {
+            // 扣除生命值
+            this.playerHealth -= 1;
+
+            // 标记技能已使用
+            this.skillsUsed[skillType] = true;
+        }
+
+        // 更新UI
+        this.updateUI();
+    }
+
+    // 侦察敌情技能
+    useRevealSkill() {
+        this.skillHint.textContent = "已显示敌方当前手牌！";
+
+        // 记录当前敌方所有卡牌为已侦察
+        this.enemyHand.forEach(card => {
+            if (!this.revealedEnemyCards.includes(card.id)) {
+                this.revealedEnemyCards.push(card.id);
+            }
+        });
+
+        // 重新渲染敌方手牌
+        this.renderCards();
+
+        return true; // 技能使用成功
+    }
+
+    // 紧急补给技能
+    useDrawSkill() {
+        if (this.playerDeck.length < 1) {
+            this.skillHint.textContent = "牌库已空，无法抽牌！";
+            return false; // 技能使用失败
+        }
+
+        this.skillHint.textContent = "已抽取2张额外卡牌！";
+
+        // 抽两张牌
+        const card1 = this.drawPlayerCard();
+        const card2 = this.drawPlayerCard();
+
+        if (card1) this.playerHand.push(card1);
+        if (card2) this.playerHand.push(card2);
+
+        // 重新渲染玩家手牌
+        this.renderCards();
+
+        return true; // 技能使用成功
+    }
+
+    // 重整旗鼓技能
+    useRedrawSkill() {
+        if (this.playerHand.length === 0) {
+            this.skillHint.textContent = "手牌已空，无法重抽！";
+            return false; // 技能使用失败
+        }
+        if (this.playerDeck.length < 1) {
+            this.skillHint.textContent = "牌库不足，无法重抽！";
+            return false; // 技能使用失败
+        }
+
+        this.skillHint.textContent = "已重新抽取手牌！";
+
+        // 记录当前手牌数量
+        const handSize = this.playerHand.length;
+
+        // 丢弃所有手牌（不是放回牌库）
+        /*
+        this.playerHand.forEach(card => {
+            this.playerDeck.push(card);
+        });
+        */
+
+        // 清空手牌
+        this.playerHand = [];
+
+        // 重新抽取相同数量的卡牌
+        for (let i = 0; i < handSize; i++) {
+            const card = this.drawPlayerCard();
+            if (card) {
+                this.playerHand.push(card);
+            }
+        }
+
+        // 清空选择
+        this.selectedCards = [];
+
+        // 重新渲染玩家手牌
+        this.renderCards();
+
+        return true; // 技能使用成功
+    }
+
+    // 妙手空空技能
+    useStealSkill() {
+        if (this.enemyHand.length === 0) {
+            this.skillHint.textContent = "敌方手牌已空，无法偷取！";
+            return false; // 技能使用失败
+        }
+
+        this.skillHint.textContent = "请点击要偷取的敌方卡牌！";
+        this.stealMode = true;
+
+        // 重新渲染敌方手牌，使其可点击
+        this.renderCards();
+
+        return true; // 技能使用成功
+    }
+
+    // 偷取敌方卡牌
+    stealEnemyCard(cardId) {
+        // 找到要偷取的卡牌
+        const cardIndex = this.enemyHand.findIndex(card => card.id === cardId);
+
+        if (cardIndex !== -1) {
+            // 从敌方手牌中移除
+            const [stolenCard] = this.enemyHand.splice(cardIndex, 1);
+
+            // 防止存在同ID卡牌，ID+100
+            stolenCard.id += 100; // 确保ID唯一
+
+            // 添加到玩家手牌
+            this.playerHand.push(stolenCard);
+
+            // 退出偷取模式
+            this.stealMode = false;
+            this.skillHint.textContent = `已偷取敌方卡牌 #${stolenCard.id}！`;
+
+            // 重新渲染双方手牌
+            this.renderCards();
+        }
     }
 }

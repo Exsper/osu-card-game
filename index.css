@@ -221,10 +221,10 @@ h1 {
 .card.double-high {
     position: relative;
     border: 2px solid transparent;
-    background: linear-gradient(45deg, 
-        #ff6b6b 0%, 
-        #9b59b6 50%, 
-        #2ecc71 100%);
+    background: linear-gradient(45deg,
+            #ff6b6b 0%,
+            #9b59b6 50%,
+            #2ecc71 100%);
 }
 
 .card.double-high::before {
@@ -234,10 +234,10 @@ h1 {
     left: -2px;
     right: -2px;
     bottom: -2px;
-    background: linear-gradient(45deg, 
-        #ff6b6b 0%, 
-        #9b59b6 50%, 
-        #2ecc71 100%);
+    background: linear-gradient(45deg,
+            #ff6b6b 0%,
+            #9b59b6 50%,
+            #2ecc71 100%);
     z-index: -1;
     border-radius: 12px;
 }
@@ -409,4 +409,110 @@ button:disabled {
     border-radius: 5px;
     font-size: 0.9rem;
     text-align: left;
+}
+
+/* 技能区域样式 */
+.skills-area {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 20px;
+}
+
+.skills-area h3 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #feca57;
+}
+
+.skills {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
+
+.skill-card {
+    width: 220px;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    border-radius: 10px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.skill-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.skill-card.used, .skill-card.disabled{
+    opacity: 0.5;
+    filter: grayscale(80%);
+    cursor: not-allowed;
+}
+
+.skill-card.used:hover , .skill-card.disabled:hover {
+    transform: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.skill-card .skill-left {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ff6b6b;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.skill-card.used .skill-left {
+    display: none;
+}
+
+.skill-card .skill-name {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: #feca57;
+}
+
+.skill-card .skill-desc {
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* 偷取模式下的敌方卡牌样式 */
+.enemy-card.steal-target {
+    border: 2px solid #feca57;
+    box-shadow: 0 0 15px #feca57;
+    cursor: pointer;
+    transform: scale(1.05);
+}
+
+.enemy-card.steal-target:hover {
+    transform: scale(1.1);
+}
+
+/* 侦察模式下显示的敌方卡牌 */
+.enemy-card.revealed {
+    opacity: 1;
+    filter: none;
+}
+
+.skill-hint {
+    text-align: center;
+    margin-top: 10px;
+    color: #feca57;
+    font-style: italic;
+    font-size: 0.9rem;
 }
