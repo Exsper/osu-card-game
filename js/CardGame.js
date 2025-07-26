@@ -102,6 +102,7 @@ class CardGame {
         this.playerPlayedEl.innerHTML = '';
         this.enemyPlayedEl.innerHTML = '';
         this.battleOutcome.textContent = '等待开始...';
+        this.comparisonDetail.textContent = '';
         this.criticalIndicator.innerHTML = '';
 
         // 更新UI
