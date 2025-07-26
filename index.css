@@ -185,6 +185,17 @@ h1 {
     gap: 10px;
 }
 
+.card.disabled {
+    opacity: 0.5;
+    filter: grayscale(80%);
+    cursor: not-allowed;
+}
+
+.card.disabled:hover {
+    transform: none !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+}
+
 .stat {
     display: flex;
     justify-content: space-between;

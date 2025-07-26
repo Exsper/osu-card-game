@@ -12,6 +12,7 @@ class CardGame {
         this.currentMod = 'NM';
         this.isTB = false;
         this.gameOver = false;
+        this.hasPlayed = false; // 标记是否已出牌
 
         // DOM元素引用
         this.playerHandEl = document.getElementById('player-hand');
@@ -47,6 +48,7 @@ class CardGame {
         this.selectedCards = [];
         this.isTB = false;
         this.gameOver = false;
+        this.hasPlayed = false;
 
         // 创建共享牌库（基础牌库）
         this.createBaseDeck();
@@ -173,6 +175,28 @@ class CardGame {
     createCardElement(card, isPlayer) {
         const cardEl = document.createElement('div');
         cardEl.className = 'card';
+
+        // 判断是否禁用
+        let disabled = false;
+        if (isPlayer) {
+            // 情况1：已出牌但未结束回合
+            if (this.hasPlayed) {
+                disabled = true;
+            }
+            // 情况2：未出牌但选择已达上限
+            else {
+                const maxSelection = this.isTB ? 4 : 3;
+                if (this.selectedCards.length >= maxSelection &&
+                    !this.selectedCards.includes(card.id)) {
+                    disabled = true;
+                }
+            }
+        }
+
+        if (disabled) {
+            cardEl.classList.add('disabled');
+        }
+
         if (isPlayer && this.selectedCards.includes(card.id)) {
             cardEl.classList.add('selected');
         }
@@ -206,7 +230,8 @@ class CardGame {
                     <div class="card-footer">ID: ${card.id}</div>
                 `;
 
-        if (isPlayer) {
+        // 只有未禁用的卡牌才添加点击事件
+        if (isPlayer && !disabled) {
             cardEl.addEventListener('click', () => {
                 this.toggleCardSelection(card);
             });
@@ -216,7 +241,7 @@ class CardGame {
     }
 
     toggleCardSelection(card) {
-        if (this.gameOver) return;
+        if (this.gameOver || this.hasPlayed) return; // 已出牌或游戏结束不能选择
 
         const index = this.selectedCards.indexOf(card.id);
 
@@ -239,6 +264,9 @@ class CardGame {
     }
 
     playSelectedCards() {
+        // 标记已出牌
+        this.hasPlayed = true;
+
         if (this.selectedCards.length === 0 || this.selectedCards.length > (this.isTB ? 4 : 3)) return;
 
         // 获取玩家选择的卡牌
@@ -489,6 +517,9 @@ class CardGame {
         this.enemyPlayedEl.innerHTML = '';
         this.battleResult.textContent = '等待开始...';
         this.criticalIndicator.innerHTML = '';
+
+        // 重置已出牌状态
+        this.hasPlayed = false;
 
         // 更新UI
         this.updateUI();
