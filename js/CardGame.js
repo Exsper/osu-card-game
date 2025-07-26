@@ -1,5 +1,6 @@
 class CardGame {
-    constructor() {
+    constructor(useRealPlayers = false) {
+        this.useRealPlayers = useRealPlayers; // 是否使用真实玩家数据
         this.deckCount = 25; // 每副牌的卡牌数量
         this.fullHealth = 6; // 初始生命值
         this.playerHealth = 6;
@@ -111,13 +112,36 @@ class CardGame {
 
     createBaseDeck() {
         this.baseDeck = [];
-        const mods = ['HR', 'EZ', 'DT', 'HD'];
+        // const mods = ['HR', 'EZ', 'DT', 'HD'];
 
-        for (let i = 0; i < this.deckCount; i++) {
-            // 卡牌生成策略
-            let card = new Card(i + 1);
+        let osuPlayers = [
+            { userId: 2360046, userName: 'Candy', mod: 'HD', aim: 4, spd: 2, acc: 7 },
+            { userId: 2, userName: 'peppy', mod: 'EZ', aim: 1, spd: 1, acc: 1 },
+        ];
+
+        let osuPlayerCount = (this.useRealPlayers) ? osuPlayers.length : 0;
+        // 创建玩家卡牌
+        for (let i = 0; i < osuPlayerCount; i++) {
+            const player = osuPlayers[i];
+            const card = new Card(i + 1, {
+                mod: player.mod,
+                aim: player.aim,
+                spd: player.spd,
+                acc: player.acc
+            }, {
+                userId: player.userId,
+                userName: player.userName
+            });
 
             this.baseDeck.push(card);
+        }
+
+        if (osuPlayerCount < this.deckCount) {
+            // 填充剩余卡牌
+            for (let i = osuPlayerCount; i < this.deckCount; i++) {
+                const card = new Card(i + 1);
+                this.baseDeck.push(card);
+            }
         }
     }
 
@@ -288,7 +312,17 @@ class CardGame {
         spdValue += card.spd + ((multiplier > 1) ? ` +${(card.spd * (multiplier - 1)).toFixed(1)}` : "");
         accValue += card.acc + ((multiplier > 1) ? ` +${(card.acc * (multiplier - 1)).toFixed(1)}` : "");
 
+        // 添加玩家信息
+        const playerInfo =
+            (this.useRealPlayers) ?
+                `<div class="player-header">
+                <img src="${card.avatarUrl}" alt="${card.userName}" class="player-avatar">
+                <div class="player-name">${card.userName}</div>
+            </div>`
+                : ``;
+
         cardEl.innerHTML = `
+                    ${playerInfo}
                     <div class="card-header">
                         <div class="card-mod ${card.mod === this.currentMod ? 'highlight' : ''}">${card.mod}</div>
                     </div>
@@ -306,7 +340,7 @@ class CardGame {
                             <span class="stat-value">${accValue}</span>
                         </div>
                     </div>
-                    <div class="card-footer">ID: ${card.id}</div>
+                    <div class="card-footer">${(this.useRealPlayers) ? "osuID: " + card.userId : "ID" + card.id}</div>
                 `;
 
         // 只有未禁用的玩家卡牌才添加点击事件

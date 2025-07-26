@@ -3,9 +3,10 @@ class Card {
      * 
      * @param {num} id 卡牌ID
      * @param {{mod: string, aim: num, spd: num, acc: num}} params 卡牌参数
+     * @param {{userId: num, userName: string}} userInfo 用户信息
      * - mod: 卡牌模式 (HR, EZ, DT, HD)
      */
-    constructor(id, params = {}) {
+    constructor(id, params = {}, userInfo = {}) {
         this.id = id;
 
         // 如果未提供参数，则随机生成
@@ -17,6 +18,16 @@ class Card {
             this.aim = params.aim;
             this.spd = params.spd;
             this.acc = params.acc;
+        }
+        if (typeof userInfo.userId !== 'number' || typeof userInfo.userName !== 'string') {
+            this.userId = 0;
+            this.userName = '虚拟用户' + this.id; // 默认用户名
+            this.avatarUrl = 'https://a.ppy.sh/-1'; // 默认头像
+        }
+        else {
+            this.userId = userInfo.userId;
+            this.userName = userInfo.userName;
+            this.avatarUrl = `https://a.ppy.sh/${this.userId}?${Date.now()}`
         }
     }
 

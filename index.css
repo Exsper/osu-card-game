@@ -166,6 +166,33 @@ h1 {
     align-items: center;
 }
 
+/* 玩家头部样式 */
+.player-header {
+    display: flex;
+    align-items: center;
+    padding: 2px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px 8px 0 0;
+    margin: -15px -15px 2px -15px;
+}
+
+.player-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    margin-right: 10px;
+    object-fit: cover;
+}
+
+.player-name {
+    font-weight: bold;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .card-mod {
     font-weight: bold;
     text-transform: uppercase;
@@ -183,6 +210,7 @@ h1 {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    margin-top: 5px;
 }
 
 .card.disabled {

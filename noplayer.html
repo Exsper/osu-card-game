@@ -134,19 +134,13 @@
                 <li>当双方都只剩1点生命时，进入TB决斗，可以出最多4张卡牌</li>
                 <li>生命值先归零的一方失败</li>
             </ul>
-            <h3>下一步计划</h3>
-            <ul>
-                <li>将更多现实玩家加入卡组，欢迎<a href="https://github.com/Exsper/osu-card-game/issues" target="_blank">报名</a>，提供osuId、aim、spd、acc和擅长mod</li>
-                <li>不喜欢显示现实玩家？转到<a href="./noplayer.html">这里</a></li>
-                <li>欢迎提出任何<a href="https://github.com/Exsper/osu-card-game/issues" target="_blank">意见和建议</a></li>
-            </ul>
         </div>
     </div>
 
     <script>
         // 初始化游戏
         document.addEventListener('DOMContentLoaded', () => {
-            const game = new CardGame(true); // true表示使用真实玩家
+            const game = new CardGame(false); // false表示不使用真实玩家
         });
     </script>
 </body>
