@@ -234,10 +234,17 @@ class CardGame {
     }
 
     enemyAI() {
-        // 简单AI策略：随机选择1-3张牌
-        const cardCount = this.isTB ?
-            Math.min(4, this.enemyHand.length) :
-            Math.min(3, Math.floor(Math.random() * 3) + 1);
+        // 简单AI策略：随机选择1-3张牌，特殊情况下3张牌
+        let needFull = false;
+        if (this.enemyHand.length > 5) needFull = true;
+        if (this.enemyHealth < 3) needFull = true;
+
+        let cardCount = 0;
+        if (this.isTB) cardCount = 4;
+        else if (needFull) cardCount = 3;
+        else cardCount = Math.floor(Math.random() * 3) + 1;
+
+        cardCount = Math.min(cardCount, this.enemyHand.length);
 
         const selected = [];
         const handCopy = [...this.enemyHand];
