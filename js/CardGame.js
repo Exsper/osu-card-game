@@ -407,6 +407,9 @@ class CardGame {
             spd += card.spd * (multiplier * 10) / 10;
             acc += card.acc * (multiplier * 10) / 10;
         });
+        aim = aim * 10 / 10;
+        spd = spd * 10 / 10;
+        acc = acc * 10 / 10;
 
         return { aim, spd, acc };
     }
