@@ -148,7 +148,7 @@ class CardGame {
         let spdValue = "";
         let accValue = "";
         // 计算实际值（考虑MOD效果）
-        const multiplier = (card.mod === this.currentMod) ? 1.2 : 1;
+        const multiplier = (card.mod === this.currentMod) ? 1.5 : 1;
         aimValue += card.aim + ((multiplier > 1) ? ` +${(card.aim * (multiplier - 1)).toFixed(1)}` : "");
         spdValue += card.spd + ((multiplier > 1) ? ` +${(card.spd * (multiplier - 1)).toFixed(1)}` : "");
         accValue += card.acc + ((multiplier > 1) ? ` +${(card.acc * (multiplier - 1)).toFixed(1)}` : "");
@@ -409,7 +409,7 @@ class CardGame {
         let acc = 0;
 
         cards.forEach(card => {
-            const multiplier = (card.mod === this.currentMod) ? 1.2 : 1;
+            const multiplier = (card.mod === this.currentMod) ? 1.5 : 1;
             aim += card.aim * (multiplier * 10) / 10;
             spd += card.spd * (multiplier * 10) / 10;
             acc += card.acc * (multiplier * 10) / 10;
