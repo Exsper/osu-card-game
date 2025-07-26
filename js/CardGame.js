@@ -69,7 +69,7 @@ class CardGame {
         this.deck = [];
         const mods = ['HR', 'EZ', 'DT', 'HD'];
 
-        for (let i = 0; i < 40; i++) {
+        for (let i = 0; i < 50; i++) {
             const card = {
                 id: i,
                 aim: Math.floor(Math.random() * 10) + 1,
