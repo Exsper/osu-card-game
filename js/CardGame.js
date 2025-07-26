@@ -5,7 +5,9 @@ class CardGame {
         this.round = 1;
         this.playerHand = [];
         this.enemyHand = [];
-        this.deck = [];
+        this.baseDeck = [];
+        this.playerDeck = [];
+        this.enemyDeck = [];
         this.selectedCards = [];
         this.currentMod = 'NM';
         this.isTB = false;
@@ -46,8 +48,12 @@ class CardGame {
         this.isTB = false;
         this.gameOver = false;
 
-        // 创建牌库
-        this.createDeck();
+        // 创建共享牌库（基础牌库）
+        this.createBaseDeck();
+
+        // 为玩家和电脑创建独立的牌库副本
+        this.playerDeck = JSON.parse(JSON.stringify(this.baseDeck));
+        this.enemyDeck = JSON.parse(JSON.stringify(this.baseDeck));
 
         // 初始抽牌
         this.drawInitialCards();
@@ -65,11 +71,11 @@ class CardGame {
         this.updateUI();
     }
 
-    createDeck() {
-        this.deck = [];
+    createBaseDeck() {
+        this.baseDeck = [];
         const mods = ['HR', 'EZ', 'DT', 'HD'];
 
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 25; i++) {
             const card = {
                 id: i,
                 aim: Math.floor(Math.random() * 10) + 1,
@@ -77,7 +83,7 @@ class CardGame {
                 acc: Math.floor(Math.random() * 10) + 1,
                 mod: mods[Math.floor(Math.random() * mods.length)]
             };
-            this.deck.push(card);
+            this.baseDeck.push(card);
         }
     }
 
@@ -85,11 +91,31 @@ class CardGame {
         this.playerHand = [];
         this.enemyHand = [];
 
-        // 初始抽6张牌
+        // 初始抽6张牌（各自从自己的牌库抽）
         for (let i = 0; i < 6; i++) {
-            this.playerHand.push(this.drawCard());
-            this.enemyHand.push(this.drawCard());
+            let playerCard = this.drawPlayerCard();
+            let enemyCard = this.drawEnemyCard();
+            if (playerCard !== null) this.playerHand.push(playerCard);
+            if (enemyCard !== null) this.enemyHand.push(enemyCard);
         }
+    }
+
+    drawPlayerCard() {
+        if (this.playerDeck.length === 0) {
+            console.log("玩家牌库已空");
+            return null;
+        }
+        const index = Math.floor(Math.random() * this.playerDeck.length);
+        return this.playerDeck.splice(index, 1)[0];
+    }
+
+    drawEnemyCard() {
+        if (this.enemyDeck.length === 0) {
+            console.log("电脑牌库已空");
+            return null;
+        }
+        const index = Math.floor(Math.random() * this.enemyDeck.length);
+        return this.enemyDeck.splice(index, 1)[0];
     }
 
     drawCard() {
@@ -432,7 +458,7 @@ class CardGame {
 
     endTurn() {
         this.endTurnBtn.disabled = true;
-        
+
         if (this.gameOver) return;
 
         // 进入下一回合
@@ -440,10 +466,12 @@ class CardGame {
 
         // 抽牌（第一回合后每回合抽2张）
         if (this.round > 1) {
-            this.playerHand.push(this.drawCard());
-            this.playerHand.push(this.drawCard());
-            this.enemyHand.push(this.drawCard());
-            this.enemyHand.push(this.drawCard());
+            for (let i = 0; i < 2; i++) {
+                let playerCard = this.drawPlayerCard();
+                let enemyCard = this.drawEnemyCard();
+                if (playerCard !== null) this.playerHand.push(playerCard);
+                if (enemyCard !== null) this.enemyHand.push(enemyCard);
+            }
         }
 
         // 检查是否进入TB模式
@@ -488,7 +516,7 @@ class CardGame {
 
         // 更新回合和卡牌数量
         this.roundEl.textContent = this.round;
-        this.cardsLeftEl.textContent = this.deck.length;
+        this.cardsLeftEl.textContent = `玩家: ${this.playerDeck.length} | 电脑: ${this.enemyDeck.length}`;
 
         // 更新MOD指示器
         if (this.isTB) this.modIndicator.textContent = '当前比赛: TB (无MOD)';
