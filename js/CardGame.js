@@ -1,7 +1,8 @@
 class CardGame {
     constructor() {
-        this.playerHealth = 5;
-        this.enemyHealth = 5;
+        this.fullHealth = 6; // 初始生命值
+        this.playerHealth = 6;
+        this.enemyHealth = 6;
         this.round = 1;
         this.playerHand = [];
         this.enemyHand = [];
@@ -42,8 +43,8 @@ class CardGame {
     }
 
     initGame() {
-        this.playerHealth = 5;
-        this.enemyHealth = 5;
+        this.playerHealth = this.fullHealth;
+        this.enemyHealth = this.fullHealth;
         this.round = 1;
         this.selectedCards = [];
         this.isTB = false;
@@ -637,8 +638,8 @@ class CardGame {
         // 更新生命值
         this.playerHealthEl.textContent = this.playerHealth;
         this.enemyHealthEl.textContent = this.enemyHealth;
-        this.playerHealthBar.style.width = `${(this.playerHealth / 5) * 100}%`;
-        this.enemyHealthBar.style.width = `${(this.enemyHealth / 5) * 100}%`;
+        this.playerHealthBar.style.width = `${(this.playerHealth / this.fullHealth) * 100}%`;
+        this.enemyHealthBar.style.width = `${(this.enemyHealth / this.fullHealth) * 100}%`;
 
         // 更新回合和卡牌数量
         this.roundEl.textContent = this.round;

@@ -219,6 +219,7 @@ h1 {
 
 /* 双高卡 - 彩色渐变边框 */
 .card.double-high {
+    position: relative;
     border: 2px solid transparent;
     background: linear-gradient(45deg, 
         #ff6b6b 0%, 
@@ -227,6 +228,8 @@ h1 {
 }
 
 .card.double-high::before {
+    content: '';
+    position: absolute;
     top: -2px;
     left: -2px;
     right: -2px;
