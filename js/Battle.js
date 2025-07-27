@@ -13,9 +13,10 @@ class Battle {
         this.cardPool = cardPool;
         this.player = player;
         this.useRealPlayers = useRealPlayers; // 是否使用真实玩家数据
-        this.fullHealth = 6; // 初始生命值
-        this.playerHealth = 6;
-        this.enemyHealth = 6;
+        // 生命值每过5局+1
+        this.fullHealth = 3 + Math.floor(this.id / 3);
+        this.playerHealth = this.fullHealth;
+        this.enemyHealth = this.fullHealth;
         this.round = 1;
         this.playerHand = [];
         this.enemyHand = [];
@@ -51,7 +52,9 @@ class Battle {
         this.playerHandEl = document.getElementById('player-hand');
         this.enemyHandEl = document.getElementById('enemy-hand');
         this.playerHealthEl = document.getElementById('player-health');
+        this.playerFullHealthEl = document.getElementById('player-fullhealth');
         this.enemyHealthEl = document.getElementById('enemy-health');
+        this.enemyFullHealthEl = document.getElementById('enemy-fullhealth');
         this.playerHealthBar = document.getElementById('player-health-bar');
         this.enemyHealthBar = document.getElementById('enemy-health-bar');
         this.roundEl = document.getElementById('round-number');
@@ -721,7 +724,9 @@ class Battle {
     updateUI() {
         // 更新生命值
         this.playerHealthEl.textContent = this.playerHealth;
+        this.playerFullHealthEl.textContent = this.fullHealth;
         this.enemyHealthEl.textContent = this.enemyHealth;
+        this.enemyFullHealthEl.textContent = this.fullHealth;
         this.playerHealthBar.style.width = `${(this.playerHealth / this.fullHealth) * 100}%`;
         this.enemyHealthBar.style.width = `${(this.enemyHealth / this.fullHealth) * 100}%`;
 
