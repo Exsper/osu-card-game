@@ -7,7 +7,7 @@
     <title>osu! 卡牌对战（预览版）</title>
     <link href="./index.css" rel="stylesheet">
     <script src="./js/Card.js"></script>
-    <script src="./js/CardGame.js"></script>
+    <script src="./js/Battle.js"></script>
 </head>
 
 <body>
@@ -136,8 +136,8 @@
             </ul>
             <h3>下一步计划</h3>
             <ul>
+                <li>结合卡牌养成模式</li>
                 <li>将更多现实玩家加入卡组，欢迎<a href="https://github.com/Exsper/osu-card-game/issues" target="_blank">报名</a>，提供osuId、aim、spd、acc和擅长mod</li>
-                <li>不喜欢显示现实玩家？转到<a href="./noplayer.html">这里</a></li>
                 <li>欢迎提出任何<a href="https://github.com/Exsper/osu-card-game/issues" target="_blank">意见和建议</a></li>
             </ul>
         </div>
@@ -146,7 +146,7 @@
     <script>
         // 初始化游戏
         document.addEventListener('DOMContentLoaded', () => {
-            const game = new CardGame(true); // true表示使用真实玩家
+            const game = new Battle(true); // true表示使用真实玩家
         });
     </script>
 </body>

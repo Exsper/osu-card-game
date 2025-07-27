@@ -1,4 +1,4 @@
-class CardGame {
+class Battle {
     constructor(useRealPlayers = false) {
         this.useRealPlayers = useRealPlayers; // 是否使用真实玩家数据
         this.deckCount = 25; // 每副牌的卡牌数量
@@ -90,8 +90,24 @@ class CardGame {
         this.createBaseDeck();
 
         // 为玩家和电脑创建独立的牌库副本
-        this.playerDeck = JSON.parse(JSON.stringify(this.baseDeck));
-        this.enemyDeck = JSON.parse(JSON.stringify(this.baseDeck));
+        this.playerDeck = this.baseDeck.map(card => new Card(card.id, {
+            mod: card.mod,
+            aim: card.aim,
+            spd: card.spd,
+            acc: card.acc
+        }, {
+            userId: card.userId,
+            userName: card.userName
+        }));
+        this.enemyDeck = this.baseDeck.map(card => new Card(card.id, {
+            mod: card.mod,
+            aim: card.aim,
+            spd: card.spd,
+            acc: card.acc
+        }, {
+            userId: card.userId,
+            userName: card.userName
+        }));
 
         // 初始抽牌
         this.drawInitialCards();
@@ -213,26 +229,7 @@ class CardGame {
                 cardEl.innerHTML = this.createCardElement(card, false).innerHTML; // 使用createCardElement生成内容
             }
             else {
-                cardEl.innerHTML = `
-                        <div class="card-header">
-                            <div class="card-mod">隐藏</div>
-                        </div>
-                        <div class="card-stats">
-                            <div class="stat">
-                                <span class="stat-name">Aim</span>
-                                <span class="stat-value">?</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-name">Spd</span>
-                                <span class="stat-value">?</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-name">Acc</span>
-                                <span class="stat-value">?</span>
-                            </div>
-                        </div>
-                        <div class="card-footer">隐藏卡牌</div>
-                    `;
+                cardEl.innerHTML = card.DrawHiddenCardInnerHTML(); // 使用Card类的隐藏卡牌HTML方法
             }
             cardEl.classList.add('enemy-card');
 
@@ -247,6 +244,12 @@ class CardGame {
         });
     }
 
+    /**
+     * 
+     * @param {Card} card 卡牌
+     * @param {boolean} isHand 是否为可操作的玩家手牌
+     * @returns 
+     */
     createCardElement(card, isHand) {
         const cardEl = document.createElement('div');
         cardEl.className = 'card';
@@ -268,32 +271,10 @@ class CardGame {
             }
         }
 
-        // 计算属性值
-        const aimVal = card.aim;
-        const spdVal = card.spd;
-        const accVal = card.acc;
-        const values = [aimVal, spdVal, accVal];
-        const maxValue = Math.max(...values);
-        const minValue = Math.min(...values);
-
-        // 判断卡牌类型
-        let cardType = "balanced"; // 默认平衡卡
-
-        // 检查单属性突出（偏科卡）
-        if (aimVal === maxValue && (aimVal - spdVal >= 3) && (aimVal - accVal >= 3)) {
-            cardType = "high-aim";
-        } else if (spdVal === maxValue && (spdVal - aimVal >= 3) && (spdVal - accVal >= 3)) {
-            cardType = "high-spd";
-        } else if (accVal === maxValue && (accVal - aimVal >= 3) && (accVal - spdVal >= 3)) {
-            cardType = "high-acc";
-        }
-        // 检查双高属性
-        else if (values.filter(v => v >= 7).length >= 2) {
-            cardType = "double-high";
-        }
-
-        // 添加类型类名
-        cardEl.classList.add(cardType);
+        // 设置卡牌样式
+        card.SetCardElStyle(cardEl);
+        // 设置卡牌内容
+        cardEl.innerHTML = card.DrawCardInnerHTML(this.currentMod, this.useRealPlayers);
 
         if (disabled) {
             cardEl.classList.add('disabled');
@@ -302,46 +283,6 @@ class CardGame {
         if (isHand && this.selectedCards.includes(card.id)) {
             cardEl.classList.add('selected');
         }
-
-        let aimValue = "";
-        let spdValue = "";
-        let accValue = "";
-        // 计算实际值（考虑MOD效果）
-        const multiplier = (card.mod === this.currentMod) ? 1.5 : 1;
-        aimValue += card.aim + ((multiplier > 1) ? ` +${(card.aim * (multiplier - 1)).toFixed(1)}` : "");
-        spdValue += card.spd + ((multiplier > 1) ? ` +${(card.spd * (multiplier - 1)).toFixed(1)}` : "");
-        accValue += card.acc + ((multiplier > 1) ? ` +${(card.acc * (multiplier - 1)).toFixed(1)}` : "");
-
-        // 添加玩家信息
-        const playerInfo =
-            (this.useRealPlayers) ?
-                `<div class="player-header">
-                <img src="${card.avatarUrl}" alt="${card.userName}" class="player-avatar">
-                <div class="player-name">${card.userName}</div>
-            </div>`
-                : ``;
-
-        cardEl.innerHTML = `
-                    ${playerInfo}
-                    <div class="card-header">
-                        <div class="card-mod ${card.mod === this.currentMod ? 'highlight' : ''}">${card.mod}</div>
-                    </div>
-                    <div class="card-stats">
-                        <div class="stat">
-                            <span class="stat-name">Aim</span>
-                            <span class="stat-value">${aimValue}</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-name">Spd</span>
-                            <span class="stat-value">${spdValue}</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-name">Acc</span>
-                            <span class="stat-value">${accValue}</span>
-                        </div>
-                    </div>
-                    <div class="card-footer">${(this.useRealPlayers) ? "osuID: " + card.userId : "ID" + card.id}</div>
-                `;
 
         // 只有未禁用的玩家卡牌才添加点击事件
         if (isHand && !disabled) {
