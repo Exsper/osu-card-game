@@ -213,7 +213,7 @@ class Game {
         this.totalCardsEl.textContent = this.cardPool.playerDeck.length;
 
         // 更新比赛次数
-        this.battleCountEl.textContent = this.cardPool.progress;
+        this.battleCountEl.textContent = this.cardPool.progress + 1;
     }
 
 
