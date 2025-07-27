@@ -282,13 +282,23 @@ class Game {
 
         // 升级按钮
         this.upgradeBtn.addEventListener('click', () => {
+            if (this.selectedAction && this.selectedAction !== 'upgrade') {
+                this.selectedCards = []; // 清空选中卡牌
+                this.renderCollection();  // 重新渲染卡牌
+            }
             this.selectedAction = 'upgrade';
             this.actionHint.textContent = "请选择要升级的目标卡牌";
+
         });
 
         // 技能充能按钮
         this.rechargeBtn.addEventListener('click', () => {
+            if (this.selectedAction && this.selectedAction !== 'recharge') {
+                this.selectedCards = []; // 清空选中卡牌
+                this.renderCollection();  // 重新渲染卡牌
+            }
             this.selectedAction = 'recharge';
+            this.selectedCards = []; // 清空选中卡牌
             if (this.selectedCards.length !== 2) {
                 this.actionHint.textContent = "请选择两张材料卡牌";
                 return;
@@ -329,6 +339,10 @@ class Game {
 
         // 丢弃按钮
         this.discardBtn.addEventListener('click', () => {
+            if (this.selectedAction && this.selectedAction !== 'discard') {
+                this.selectedCards = []; // 清空选中卡牌
+                this.renderCollection();  // 重新渲染卡牌
+            }
             this.selectedAction = 'discard';
             this.actionHint.textContent = "请选择要丢弃的卡牌";
         });
