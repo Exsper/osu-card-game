@@ -7,6 +7,7 @@
     <title>osu! 卡牌对战（预览版）</title>
     <link href="./index.css" rel="stylesheet">
     <script src="./js/Card.js"></script>
+    <script src="./js/CardPool.js"></script>
     <script src="./js/Battle.js"></script>
 </head>
 
@@ -58,8 +59,6 @@
 
         <div class="actions">
             <button id="play-btn" disabled>出牌 (选择1-3张)</button>
-            <button id="end-turn-btn">下一回合</button>
-            <button id="restart-btn">重新开始</button>
         </div>
 
         <!-- 技能区域 -->
@@ -75,7 +74,7 @@
                 <div class="skill-card" id="skill2" data-skill="draw">
                     <div class="skill-left">1</div>
                     <div class="skill-name">紧急补给</div>
-                    <div class="skill-desc">额外抽取2张卡牌</div>
+                    <div class="skill-desc">从剩余牌库中额外抽取2张卡牌</div>
                 </div>
 
                 <div class="skill-card" id="skill3" data-skill="redraw">
@@ -87,7 +86,7 @@
                 <div class="skill-card" id="skill4" data-skill="steal">
                     <div class="skill-left">1</div>
                     <div class="skill-name">妙手空空</div>
-                    <div class="skill-desc">从敌人手中偷取1张指定的卡牌</div>
+                    <div class="skill-desc">从敌人手中偷取1张指定的卡牌（只能在此次对局使用，无法继承）</div>
                 </div>
             </div>
             <div class="skill-hint" id="skill-hint">生命值大于1时可以使用技能</div>
@@ -120,6 +119,11 @@
             <div id="comparison-detail" class="comparison-detail"></div>
         </div>
 
+        <div class="actions">
+            <button id="end-turn-btn">下一回合</button>
+            <button id="restart-btn">重新开始</button>
+        </div>
+
         <div class="instructions">
             <h3>游戏规则</h3>
             <ul>
@@ -136,7 +140,7 @@
             </ul>
             <h3>下一步计划</h3>
             <ul>
-                <li>结合卡牌养成模式</li>
+                <li>结合卡牌养成模式（进行中，若网页有bug请见谅）</li>
                 <li>将更多现实玩家加入卡组，欢迎<a href="https://github.com/Exsper/osu-card-game/issues" target="_blank">报名</a>，提供osuId、aim、spd、acc和擅长mod</li>
                 <li>欢迎提出任何<a href="https://github.com/Exsper/osu-card-game/issues" target="_blank">意见和建议</a></li>
             </ul>
@@ -146,7 +150,10 @@
     <script>
         // 初始化游戏
         document.addEventListener('DOMContentLoaded', () => {
-            const game = new Battle(true); // true表示使用真实玩家
+            // 创建卡池
+            const cardPool = new CardPool();
+
+            const game = new Battle(cardPool, true); // true表示使用真实玩家
         });
     </script>
 </body>

@@ -1,14 +1,18 @@
 class Battle {
-    constructor(useRealPlayers = false) {
+    /**
+     * 
+     * @param {CardPool} cardPool 整个游戏的全部卡牌
+     * @param {boolean} useRealPlayers 是否使用真实玩家数据
+     */
+    constructor(cardPool, useRealPlayers = false) {
+        this.cardPool = cardPool;
         this.useRealPlayers = useRealPlayers; // 是否使用真实玩家数据
-        this.deckCount = 25; // 每副牌的卡牌数量
         this.fullHealth = 6; // 初始生命值
         this.playerHealth = 6;
         this.enemyHealth = 6;
         this.round = 1;
         this.playerHand = [];
         this.enemyHand = [];
-        this.baseDeck = [];
         this.playerDeck = [];
         this.enemyDeck = [];
         this.selectedCards = [];
@@ -41,7 +45,6 @@ class Battle {
         this.restartBtn = document.getElementById('restart-btn');
         this.playerPlayedEl = document.getElementById('player-played');
         this.enemyPlayedEl = document.getElementById('enemy-played');
-        this.battleResult = document.getElementById('battle-result');
         this.criticalIndicator = document.getElementById('critical-indicator');
         this.battleOutcome = document.getElementById('battle-outcome');
         this.comparisonDetail = document.getElementById('comparison-detail');
@@ -86,11 +89,8 @@ class Battle {
         this.stealMode = false;
         this.revealedEnemyCards = [];
 
-        // 创建共享牌库（基础牌库）
-        this.createBaseDeck();
-
-        // 为玩家和电脑创建独立的牌库副本
-        this.playerDeck = this.baseDeck.map(card => new Card(card.id, {
+        // 从cardPool中深拷贝玩家和敌人的卡池，对战中不能影响玩家实际卡池（偷取技能也只针对本局游戏）
+        this.playerDeck = this.cardPool.playerDeck.map(card => new Card(card.id, {
             mod: card.mod,
             aim: card.aim,
             spd: card.spd,
@@ -99,7 +99,7 @@ class Battle {
             userId: card.userId,
             userName: card.userName
         }));
-        this.enemyDeck = this.baseDeck.map(card => new Card(card.id, {
+        this.enemyDeck = this.cardPool.enemyDeck.map(card => new Card(card.id, {
             mod: card.mod,
             aim: card.aim,
             spd: card.spd,
@@ -125,42 +125,6 @@ class Battle {
         // 更新UI
         this.updateUI();
     }
-
-    createBaseDeck() {
-        this.baseDeck = [];
-        // const mods = ['HR', 'EZ', 'DT', 'HD'];
-
-        let osuPlayers = [
-            { userId: 2360046, userName: 'Candy', mod: 'HD', aim: 4, spd: 2, acc: 7 },
-            { userId: 2, userName: 'peppy', mod: 'EZ', aim: 1, spd: 1, acc: 1 },
-        ];
-
-        let osuPlayerCount = (this.useRealPlayers) ? osuPlayers.length : 0;
-        // 创建玩家卡牌
-        for (let i = 0; i < osuPlayerCount; i++) {
-            const player = osuPlayers[i];
-            const card = new Card(i + 1, {
-                mod: player.mod,
-                aim: player.aim,
-                spd: player.spd,
-                acc: player.acc
-            }, {
-                userId: player.userId,
-                userName: player.userName
-            });
-
-            this.baseDeck.push(card);
-        }
-
-        if (osuPlayerCount < this.deckCount) {
-            // 填充剩余卡牌
-            for (let i = osuPlayerCount; i < this.deckCount; i++) {
-                const card = new Card(i + 1);
-                this.baseDeck.push(card);
-            }
-        }
-    }
-
 
 
     drawInitialCards() {
@@ -192,15 +156,6 @@ class Battle {
         }
         const index = Math.floor(Math.random() * this.enemyDeck.length);
         return this.enemyDeck.splice(index, 1)[0];
-    }
-
-    drawCard() {
-        if (this.deck.length === 0) {
-            console.log("牌库已空");
-            return null;
-        }
-        const index = Math.floor(Math.random() * this.deck.length);
-        return this.deck.splice(index, 1)[0];
     }
 
     setRandomMod() {
@@ -558,19 +513,23 @@ class Battle {
 
     // 检查玩家和电脑的手牌和牌库数量，均为0时游戏结束
     checkHandAndDeckIsEmpty() {
-        // 玩家牌库为空且手牌也为空时，若无法发动偷取技能，则游戏无法进行，判定为游戏结束
-        if (this.playerDeck.length === 0 && this.playerHand.length === 0 && (this.skillsUsed.steal === true || this.playerHealth <= 1)) {
+        // 电脑牌库为空且手牌也为空时判定失败
+        if (this.enemyDeck.length === 0 && this.enemyHand.length === 0) {
             this.gameOver = true;
-            this.battleResult.textContent = "游戏结束! 玩家无牌可出，电脑获胜!";
+            this.battleOutcome.textContent = "游戏结束! 电脑无牌可出，玩家获胜!";
+            const outcomeClass = "player-win";
+            this.battleOutcome.className = `battle-outcome ${outcomeClass}`;
             this.playBtn.disabled = true;
             this.endTurnBtn.disabled = true;
             return true;
         }
 
-        // 电脑牌库为空且手牌也为空时判定失败
-        if (this.enemyDeck.length === 0 && this.enemyHand.length === 0) {
+        // 玩家牌库为空且手牌也为空时，若无法发动偷取技能，则游戏无法进行，判定为游戏结束
+        if (this.playerDeck.length === 0 && this.playerHand.length === 0 && (this.skillsUsed.steal === true || this.playerHealth <= 1)) {
             this.gameOver = true;
-            this.battleResult.textContent = "游戏结束! 电脑无牌可出，玩家获胜!";
+            this.battleOutcome.textContent = "游戏结束! 玩家无牌可出，电脑获胜!";
+            const outcomeClass = "enemy-win";
+            this.battleOutcome.className = `battle-outcome ${outcomeClass}`;
             this.playBtn.disabled = true;
             this.endTurnBtn.disabled = true;
             return true;
@@ -617,6 +576,7 @@ class Battle {
         this.playerPlayedEl.innerHTML = '';
         this.enemyPlayedEl.innerHTML = '';
         this.battleOutcome.textContent = '请出牌...';
+        this.battleOutcome.className = `battle-outcome`;
         this.comparisonDetail.textContent = '';
         this.criticalIndicator.innerHTML = '';
 
