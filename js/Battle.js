@@ -53,6 +53,7 @@ class Battle {
         this.playerHealthBar = document.getElementById('player-health-bar');
         this.enemyHealthBar = document.getElementById('enemy-health-bar');
         this.roundEl = document.getElementById('round-number');
+        this.battleNumberEl = document.getElementById('battle-number');
         this.cardsLeftEl = document.getElementById('cards-left');
         this.modIndicator = document.getElementById('mod-indicator');
         this.playBtn = document.getElementById('play-btn');
@@ -580,6 +581,7 @@ class Battle {
             this.endTurnBtn.disabled = false;
             this.isPlayerWin = 1;
             this.endTurnBtn.textContent = '选择奖励';
+            this.showResultPhase();
             return true;
         }
 
@@ -593,6 +595,7 @@ class Battle {
             this.endTurnBtn.disabled = false;
             this.isPlayerWin = 0;
             this.endTurnBtn.textContent = '重新开始';
+            this.showResultPhase();
             return true;
         }
 
@@ -722,6 +725,7 @@ class Battle {
 
         // 更新回合和卡牌数量
         this.roundEl.textContent = this.round;
+        this.battleNumberEl.textContent = this.id + 1;
         this.cardsLeftEl.textContent = `玩家: ${this.playerDeck.length} | 电脑: ${this.enemyDeck.length}`;
 
         // 更新MOD指示器
