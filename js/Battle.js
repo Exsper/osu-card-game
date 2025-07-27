@@ -637,7 +637,7 @@ class Battle {
             this.initGame();
         */
         if (this.isPlayerWin === 1) {
-            window.game.battleCount += 1;
+            // window.game.battleCount += 1;
             this.showRewardPhase();
             window.game.showRewardScreen();
         }
