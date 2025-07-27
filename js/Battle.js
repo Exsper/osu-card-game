@@ -7,6 +7,8 @@ class Battle {
      * @param {boolean} useRealPlayers 是否使用真实玩家数据
      */
     constructor(id, cardPool, player, useRealPlayers = false) {
+        this.modMultiplier = 1.5;
+
         this.id = id;
         this.cardPool = cardPool;
         this.player = player;
@@ -557,14 +559,11 @@ class Battle {
         let acc = 0;
 
         cards.forEach(card => {
-            const multiplier = (card.mod === this.currentMod) ? 1.5 : 1;
-            aim += card.aim * (multiplier * 10) / 10;
-            spd += card.spd * (multiplier * 10) / 10;
-            acc += card.acc * (multiplier * 10) / 10;
+            const multiplier = (card.mod === this.currentMod) ? this.modMultiplier : 1;
+            aim += parseFloat((card.aim * multiplier).toFixed(1));
+            spd += parseFloat((card.spd * multiplier).toFixed(1));
+            acc += parseFloat((card.acc * multiplier).toFixed(1));
         });
-        aim = aim * 10 / 10;
-        spd = spd * 10 / 10;
-        acc = acc * 10 / 10;
 
         return { aim, spd, acc };
     }
@@ -586,17 +585,20 @@ class Battle {
         }
 
         // 玩家牌库为空且手牌也为空时，若无法发动偷取技能，则游戏无法进行，判定为游戏结束
-        if (this.playerDeck.length === 0 && this.playerHand.length === 0 && (this.player.skillCounts.steal <= 0 || this.playerHealth <= 1)) {
-            this.gameOver = true;
-            this.battleOutcome.textContent = "游戏结束! 玩家无牌可出，电脑获胜!";
-            const outcomeClass = "enemy-win";
-            this.battleOutcome.className = `battle-outcome ${outcomeClass}`;
-            this.playBtn.disabled = true;
-            this.endTurnBtn.disabled = false;
-            this.isPlayerWin = 0;
-            this.endTurnBtn.textContent = '重新开始';
-            this.showResultPhase();
-            return true;
+        if (this.playerDeck.length === 0 && this.playerHand.length === 0) {
+            // 检查是否满足发动偷取的条件
+            if (this.player.skillCounts.steal <= 0 || this.skillsUsed.steal == true || this.playerHealth <= 1 || this.enemyHand.length === 0) {
+                this.gameOver = true;
+                this.battleOutcome.textContent = "游戏结束! 玩家无牌可出，电脑获胜!";
+                const outcomeClass = "enemy-win";
+                this.battleOutcome.className = `battle-outcome ${outcomeClass}`;
+                this.playBtn.disabled = true;
+                this.endTurnBtn.disabled = false;
+                this.isPlayerWin = 0;
+                this.endTurnBtn.textContent = '重新开始';
+                this.showResultPhase();
+                return true;
+            }
         }
 
         return false;
@@ -938,8 +940,8 @@ class Battle {
             // 从敌方手牌中移除
             const [stolenCard] = this.enemyHand.splice(cardIndex, 1);
 
-            // 防止存在同ID卡牌，ID+100
-            stolenCard.id += 100; // 确保ID唯一
+            // 在卡牌创建时采取了措施，不可能有相同id的卡牌
+            // stolenCard.id += 100;
 
             // 添加到玩家手牌
             this.playerHand.push(stolenCard);

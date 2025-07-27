@@ -7,6 +7,8 @@ class Card {
      * - mod: 卡牌模式 (HR, EZ, DT, HD)
      */
     constructor(id, params = {}, userInfo = {}) {
+        this.modMultiplier = 1.5;
+
         this.id = id;
 
         // 如果未提供参数，则随机生成
@@ -138,7 +140,7 @@ class Card {
         let spdValue = "";
         let accValue = "";
         // 计算实际值（考虑MOD效果）
-        const multiplier = (this.mod === currentMod) ? 1.5 : 1;
+        const multiplier = (this.mod === currentMod) ? this.modMultiplier : 1;
         aimValue += this.aim + ((multiplier > 1) ? ` +${(this.aim * (multiplier - 1)).toFixed(1)}` : "");
         spdValue += this.spd + ((multiplier > 1) ? ` +${(this.spd * (multiplier - 1)).toFixed(1)}` : "");
         accValue += this.acc + ((multiplier > 1) ? ` +${(this.acc * (multiplier - 1)).toFixed(1)}` : "");

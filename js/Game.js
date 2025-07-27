@@ -282,6 +282,7 @@ class Game {
 
         // 升级按钮
         this.upgradeBtn.addEventListener('click', () => {
+            this.skillSelectGroup.style.display = 'none';
             if (this.selectedAction && this.selectedAction !== 'upgrade') {
                 this.selectedCards = []; // 清空选中卡牌
                 this.renderCollection();  // 重新渲染卡牌
@@ -339,6 +340,7 @@ class Game {
 
         // 丢弃按钮
         this.discardBtn.addEventListener('click', () => {
+            this.skillSelectGroup.style.display = 'none';
             if (this.selectedAction && this.selectedAction !== 'discard') {
                 this.selectedCards = []; // 清空选中卡牌
                 this.renderCollection();  // 重新渲染卡牌
