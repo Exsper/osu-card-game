@@ -1,11 +1,13 @@
 class Battle {
     /**
-     * 
+     * 单次对战类，负责处理玩家和电脑的对战逻辑
      * @param {CardPool} cardPool 整个游戏的全部卡牌
+     * @param {Player} player 玩家对象
      * @param {boolean} useRealPlayers 是否使用真实玩家数据
      */
-    constructor(cardPool, useRealPlayers = false) {
+    constructor(cardPool, player, useRealPlayers = false) {
         this.cardPool = cardPool;
+        this.player = player;
         this.useRealPlayers = useRealPlayers; // 是否使用真实玩家数据
         this.fullHealth = 6; // 初始生命值
         this.playerHealth = 6;
@@ -20,7 +22,7 @@ class Battle {
         this.isTB = false;
         this.gameOver = false;
         this.hasPlayed = false; // 标记是否已出牌
-        // 技能系统变量
+        // 技能系统变量，虽然技能次数大于1可以多次使用，但是每局游戏只能使用一次
         this.skillsUsed = {
             reveal: false,
             draw: false,
@@ -42,12 +44,15 @@ class Battle {
         this.modIndicator = document.getElementById('mod-indicator');
         this.playBtn = document.getElementById('play-btn');
         this.endTurnBtn = document.getElementById('end-turn-btn');
-        this.restartBtn = document.getElementById('restart-btn');
         this.playerPlayedEl = document.getElementById('player-played');
         this.enemyPlayedEl = document.getElementById('enemy-played');
         this.criticalIndicator = document.getElementById('critical-indicator');
         this.battleOutcome = document.getElementById('battle-outcome');
         this.comparisonDetail = document.getElementById('comparison-detail');
+        this.revealSkillCount = document.getElementById('reveal-skill-count');
+        this.drawSkillCount = document.getElementById('draw-skill-count');
+        this.redrawSkillCount = document.getElementById('redraw-skill-count');
+        this.stealSkillCount = document.getElementById('steal-skill-count');
 
         // 获取技能卡片元素
         this.skill1 = document.getElementById('skill1');
@@ -60,7 +65,6 @@ class Battle {
         // 绑定事件
         this.playBtn.addEventListener('click', () => this.playSelectedCards());
         this.endTurnBtn.addEventListener('click', () => this.endTurn());
-        this.restartBtn.addEventListener('click', () => this.restartGame());
 
         // 绑定技能事件
         this.skill1.addEventListener('click', () => this.useSkill('reveal'));
@@ -119,11 +123,19 @@ class Battle {
         this.playerPlayedEl.innerHTML = '';
         this.enemyPlayedEl.innerHTML = '';
         this.battleOutcome.textContent = '等待开始...';
+        this.battleOutcome.className = `battle-outcome`;
         this.comparisonDetail.textContent = '';
         this.criticalIndicator.innerHTML = '';
 
         // 更新UI
         this.updateUI();
+
+        // 更新按钮状态
+        this.playBtn.disabled = this.selectedCards.length === 0 || this.gameOver;
+        this.playBtn.textContent = this.isTB ?
+            `出牌 (选择1-4张)` :
+            `出牌 (选择1-3张)`;
+        this.endTurnBtn.disabled = true;
     }
 
 
@@ -272,6 +284,7 @@ class Battle {
         this.renderCards();
     }
 
+    // 玩家出牌后
     playSelectedCards() {
         // 标记已出牌
         this.hasPlayed = true;
@@ -303,6 +316,8 @@ class Battle {
 
         // 显示下一回合按钮
         this.endTurnBtn.disabled = false;
+        if (this.gameOver) this.endTurnBtn.textContent = '重新开始';
+        else this.endTurnBtn.textContent = '下一回合';
 
         this.updateSkillsState();
     }
@@ -520,28 +535,49 @@ class Battle {
             const outcomeClass = "player-win";
             this.battleOutcome.className = `battle-outcome ${outcomeClass}`;
             this.playBtn.disabled = true;
-            this.endTurnBtn.disabled = true;
+            this.endTurnBtn.disabled = false;
+            this.endTurnBtn.textContent = '重新开始';
             return true;
         }
 
         // 玩家牌库为空且手牌也为空时，若无法发动偷取技能，则游戏无法进行，判定为游戏结束
-        if (this.playerDeck.length === 0 && this.playerHand.length === 0 && (this.skillsUsed.steal === true || this.playerHealth <= 1)) {
+        if (this.playerDeck.length === 0 && this.playerHand.length === 0 && (this.player.skillCounts.steal <= 0 || this.playerHealth <= 1)) {
             this.gameOver = true;
             this.battleOutcome.textContent = "游戏结束! 玩家无牌可出，电脑获胜!";
             const outcomeClass = "enemy-win";
             this.battleOutcome.className = `battle-outcome ${outcomeClass}`;
             this.playBtn.disabled = true;
-            this.endTurnBtn.disabled = true;
+            this.endTurnBtn.disabled = false;
+            this.endTurnBtn.textContent = '重新开始';
             return true;
         }
 
         return false;
     }
 
+    endGame() {
+        // 游戏已结束，如果获胜则进入挑选奖励卡牌环节，但是现在还没做，所以为了测试其他项目先重开吧
+        // 临时措施，为了测试其他功能，直接重置游戏
+        this.player.skillCounts.reveal = 1;
+        this.player.skillCounts.draw = 1;
+        this.player.skillCounts.redraw = 1;
+        this.player.skillCounts.steal = 1;
+        this.initGame();
+    }
+
+    // 到下一回合
     endTurn() {
+        // 更新按钮状态
+        this.playBtn.disabled = this.selectedCards.length === 0 || this.gameOver;
+        this.playBtn.textContent = this.isTB ?
+            `出牌 (选择1-4张)` :
+            `出牌 (选择1-3张)`;
         this.endTurnBtn.disabled = true;
 
-        if (this.gameOver) return;
+        if (this.gameOver) {
+            this.endGame();
+            return;
+        }
 
         // 进入下一回合
         this.round++;
@@ -558,9 +594,10 @@ class Battle {
 
         // 检查玩家和电脑的手牌和牌库数量
         if (this.checkHandAndDeckIsEmpty()) {
-            this.updateUI();
             return;
         }
+
+        this.updateUI();
 
         // 检查是否进入TB模式
         this.isTB = (this.playerHealth === 1 && this.enemyHealth === 1);
@@ -599,10 +636,6 @@ class Battle {
         }
     }
 
-    restartGame() {
-        this.initGame();
-    }
-
     updateUI() {
         // 更新生命值
         this.playerHealthEl.textContent = this.playerHealth;
@@ -632,13 +665,6 @@ class Battle {
         // 渲染卡牌
         this.renderCards();
 
-        // 更新按钮状态
-        this.playBtn.disabled = this.selectedCards.length === 0 || this.gameOver;
-        this.playBtn.textContent = this.isTB ?
-            `出牌 (选择1-4张)` :
-            `出牌 (选择1-3张)`;
-        this.endTurnBtn.disabled = true;
-
         // 更新技能状态
         this.updateSkillsState();
     }
@@ -648,16 +674,23 @@ class Battle {
         // 生命值不足时禁用所有技能，出牌后也无法使用技能
         const canUseSkills = this.playerHealth > 1 && !this.hasPlayed;
 
-        // 更新每个技能状态
+        // 更新技能计数
+        this.revealSkillCount.textContent = `${this.player.skillCounts.reveal}`;
+        this.drawSkillCount.textContent = `${this.player.skillCounts.draw}`;
+        this.redrawSkillCount.textContent = `${this.player.skillCounts.redraw}`;
+        this.stealSkillCount.textContent = `${this.player.skillCounts.steal}`;
+
+        // 本局使用过技能则无法再使用
         this.skill1.classList.toggle('used', this.skillsUsed.reveal);
         this.skill2.classList.toggle('used', this.skillsUsed.draw);
         this.skill3.classList.toggle('used', this.skillsUsed.redraw);
         this.skill4.classList.toggle('used', this.skillsUsed.steal);
 
-        this.skill1.classList.toggle('disabled', !canUseSkills || this.skillsUsed.reveal);
-        this.skill2.classList.toggle('disabled', !canUseSkills || this.skillsUsed.draw);
-        this.skill3.classList.toggle('disabled', !canUseSkills || this.skillsUsed.redraw);
-        this.skill4.classList.toggle('disabled', !canUseSkills || this.skillsUsed.steal);
+        // 根据技能使用情况禁用按钮
+        this.skill1.classList.toggle('disabled', !canUseSkills || this.player.skillCounts.reveal <= 0);
+        this.skill2.classList.toggle('disabled', !canUseSkills || this.player.skillCounts.draw <= 0);
+        this.skill3.classList.toggle('disabled', !canUseSkills || this.player.skillCounts.redraw <= 0);
+        this.skill4.classList.toggle('disabled', !canUseSkills || this.player.skillCounts.steal <= 0);
 
         // 更新提示
         if (!canUseSkills) {
@@ -835,9 +868,12 @@ class Battle {
             // 重新渲染双方手牌
             this.renderCards();
 
-            // 偷取后判定游戏是否结束
-            this.checkHandAndDeckIsEmpty();
             this.updateUI();
+
+            // 偷取后检查电脑的手牌和牌库数量
+            if (this.checkHandAndDeckIsEmpty()) {
+                return;
+            }
 
             // 如果已出牌，则自动结束回合，防止卡死
             if (this.hasPlayed && !this.gameOver) {
