@@ -118,17 +118,27 @@ class Card {
         // 判断卡牌类型
         let cardType = "balanced"; // 默认平衡卡
 
+        // 检查全高属性
+        if (values.filter(v => v >= 7).length >= 3) {
+            cardType = "all-high";
+        }
+        // 检查双高属性
+        else if (aimVal >= 7 && spdVal >= 7) {
+            cardType = "high-aim-spd";
+        }
+        else if (aimVal >= 7 && accVal >= 7) {
+            cardType = "high-aim-acc";
+        }
+        else if (spdVal >= 7 && accVal >= 7) {
+            cardType = "high-spd-acc";
+        }
         // 检查单属性突出（偏科卡）
-        if (aimVal === maxValue && (aimVal - spdVal >= 3) && (aimVal - accVal >= 3)) {
+        else if (aimVal === maxValue && (aimVal - spdVal >= 3) && (aimVal - accVal >= 3)) {
             cardType = "high-aim";
         } else if (spdVal === maxValue && (spdVal - aimVal >= 3) && (spdVal - accVal >= 3)) {
             cardType = "high-spd";
         } else if (accVal === maxValue && (accVal - aimVal >= 3) && (accVal - spdVal >= 3)) {
             cardType = "high-acc";
-        }
-        // 检查双高属性
-        else if (values.filter(v => v >= 7).length >= 2) {
-            cardType = "double-high";
         }
 
         // 添加类型类名

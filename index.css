@@ -250,8 +250,35 @@ h1 {
     background: rgba(46, 204, 113, 0.3);
 }
 
-/* 双高卡 - 彩色渐变边框 */
-.card.double-high {
+/* Aim/Spd高卡 */
+.card.high-aim-spd {
+    border: 2px solid #cc2e85;
+    box-shadow: 0 0 10px rgba(92, 10, 103, 0.5);
+    background: linear-gradient(45deg,
+            #ff6b6b 0%,
+            #9b59b6 100%);
+}
+
+/* Aim/Acc高卡 */
+.card.high-aim-acc {
+    border: 2px solid #c1cc2e;
+    box-shadow: 0 0 10px rgba(103, 98, 10, 0.5);
+    background: linear-gradient(45deg,
+            #ff6b6b 0%,
+            #2ecc71 100%);
+}
+
+/* Spd/Acc高卡 */
+.card.high-spd-acc {
+    border: 2px solid #2e33cc;
+    box-shadow: 0 0 10px rgba(10, 10, 103, 0.5);
+    background: linear-gradient(45deg,
+            #9b59b6 0%,
+            #2ecc71 100%);
+}
+
+/* 三高卡 - 彩色渐变边框 */
+.card.all-high {
     position: relative;
     border: 2px solid transparent;
     background: linear-gradient(45deg,
@@ -260,7 +287,7 @@ h1 {
             #2ecc71 100%);
 }
 
-.card.double-high::before {
+.card.all-high::before {
     content: '';
     position: absolute;
     top: -2px;
