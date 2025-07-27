@@ -227,8 +227,6 @@ class Game {
             this.rewardCards.appendChild(cardEl);
         });
 
-        // 显示奖励界面
-        this.rewardArea.style.display = 'block';
         this.gameState = 'reward';
     }
 
@@ -251,8 +249,6 @@ class Game {
             this.renderCollection();
             this.updateStats();
 
-            // 隐藏奖励界面
-            this.rewardArea.style.display = 'none';
             this.gameState = 'collection';
 
             // 切换到养成界面

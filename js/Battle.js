@@ -36,6 +36,15 @@ class Battle {
 
         this.isPlayerWin = -1;  // 1=playerwin 0=enemywin -1=undergoing
 
+
+        this.initUIReferences();
+        this.bindEvents();
+
+        // 初始化游戏
+        this.initGame();
+    }
+
+    initUIReferences() {
         // DOM元素引用
         this.playerHandEl = document.getElementById('player-hand');
         this.enemyHandEl = document.getElementById('enemy-hand');
@@ -64,8 +73,9 @@ class Battle {
         this.skill3 = document.getElementById('skill3');
         this.skill4 = document.getElementById('skill4');
         this.skillHint = document.getElementById('skill-hint');
+    }
 
-
+    bindEvents() {
         // 绑定事件
         this.playBtn.addEventListener('click', () => this.playSelectedCards());
         this.endTurnBtn.addEventListener('click', () => this.endTurn());
@@ -75,9 +85,6 @@ class Battle {
         this.skill2.addEventListener('click', () => this.useSkill('draw'));
         this.skill3.addEventListener('click', () => this.useSkill('redraw'));
         this.skill4.addEventListener('click', () => this.useSkill('steal'));
-
-        // 初始化游戏
-        this.initGame();
     }
 
     initGame() {
@@ -141,8 +148,33 @@ class Battle {
             `出牌 (选择1-4张)` :
             `出牌 (选择1-3张)`;
         this.endTurnBtn.disabled = true;
+
+        this.showBattlePhase();
     }
 
+    showBattlePhase() {
+        document.getElementById('battle-area').classList.toggle('hide', false);
+        document.getElementById('play-btn').classList.toggle('hide', false);
+        document.getElementById('skills-area').classList.toggle('hide', false);
+        document.getElementById('result-area').classList.toggle('hide', true);
+        document.getElementById('reward-area').classList.toggle('hide', true);
+    }
+
+    showResultPhase() {
+        document.getElementById('battle-area').classList.toggle('hide', true);
+        document.getElementById('play-btn').classList.toggle('hide', true);
+        document.getElementById('skills-area').classList.toggle('hide', true);
+        document.getElementById('result-area').classList.toggle('hide', false);
+        document.getElementById('reward-area').classList.toggle('hide', true);
+    }
+
+    showRewardPhase() {
+        document.getElementById('battle-area').classList.toggle('hide', true);
+        document.getElementById('play-btn').classList.toggle('hide', true);
+        document.getElementById('skills-area').classList.toggle('hide', true);
+        document.getElementById('result-area').classList.toggle('hide', true);
+        document.getElementById('reward-area').classList.toggle('hide', false);
+    }
 
     drawInitialCards() {
         this.playerHand = [];
@@ -328,6 +360,8 @@ class Battle {
         else this.endTurnBtn.textContent = '下一回合';
 
         this.updateSkillsState();
+
+        this.showResultPhase();
     }
 
     enemyAI() {
@@ -596,6 +630,7 @@ class Battle {
         */
         if (this.isPlayerWin === 1) {
             window.game.battleCount += 1;
+            this.showRewardPhase();
             window.game.showRewardScreen();
         }
         else {
@@ -664,6 +699,8 @@ class Battle {
 
         // 更新UI
         this.updateUI();
+
+        this.showBattlePhase();
     }
 
     checkGameEnd() {
@@ -782,6 +819,8 @@ class Battle {
 
             // 标记技能已使用
             this.skillsUsed[skillType] = true;
+            // 将技能次数减1
+            this.player.skillCounts[skillType] -= 1;
         }
 
         // 更新UI

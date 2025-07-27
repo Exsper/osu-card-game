@@ -114,7 +114,7 @@
                 当前比赛: NM (无MOD)
             </div>
 
-            <div class="battle-area">
+            <div class="battle-area" id="battle-area">
                 <div class="player-area">
                     <h3 class="area-title">你的手牌</h3>
                     <div class="card-container" id="player-hand"></div>
@@ -124,6 +124,7 @@
                     <h3 class="area-title">电脑手牌</h3>
                     <div class="card-container" id="enemy-hand"></div>
                 </div>
+
             </div>
 
             <div class="actions">
@@ -131,7 +132,7 @@
             </div>
 
             <!-- 技能区域 -->
-            <div class="skills-area">
+            <div class="skills-area" id="skills-area">
                 <h3>玩家技能（消耗1点生命值，每个技能每局只能使用一次）</h3>
                 <div class="skills">
                     <div class="skill-card" id="skill1" data-skill="reveal">
@@ -162,7 +163,7 @@
             </div>
 
             <!-- 回合结果区域 -->
-            <div class="result-area">
+            <div class="result-area" id="result-area">
                 <div class="result-title">回合结果</div>
 
                 <!-- 战斗结果放在顶部中央 -->
@@ -186,10 +187,10 @@
 
                 <!-- 详细比较信息 -->
                 <div id="comparison-detail" class="comparison-detail"></div>
-            </div>
 
-            <div class="actions">
-                <button id="end-turn-btn">下一回合</button>
+                <div class="actions">
+                    <button id="end-turn-btn">下一回合</button>
+                </div>
             </div>
 
             <!-- 奖励选择界面 -->

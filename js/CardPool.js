@@ -16,7 +16,8 @@ class CardPool {
         // 实际osu玩家。只会分配到玩家理论卡池中，每条分配到之后应删除该条
         this.osuPlayers = (this.useRealPlayers) ? [
             { userId: 2360046, userName: 'Candy', mod: 'HD', aim: 4, spd: 2, acc: 7 },
-            { userId: 2, userName: 'peppy', mod: 'EZ', aim: 1, spd: 1, acc: 1 },
+            { userId: 2, userName: 'peppy', mod: 'EZ', aim: 2, spd: 2, acc: 2 },
+            { userId: 3, userName: 'BanchoBot', mod: 'DT', aim: 2, spd: 7, acc: 2 },
         ] : [];
 
         // 创建初始卡池

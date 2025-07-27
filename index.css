@@ -665,7 +665,6 @@ button:disabled {
     padding: 20px;
     border-radius: 15px;
     margin-top: 30px;
-    display: none;
 }
 
 .reward-title {
@@ -756,6 +755,10 @@ button:disabled {
 
 .tab-content.active {
     display: block;
+}
+
+.hide {
+    display: none;
 }
 
 /* 养成界面样式 */
