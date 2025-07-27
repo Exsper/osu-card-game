@@ -69,7 +69,7 @@ class CardPool {
                     userId: player.userId,
                     userName: player.userName
                 });
-                this.adjustCardValues(card);
+                if (this.progress > 6) this.adjustCardValues(card);
                 this.deckLength += 1; // 更新卡牌数量
                 this.playerAvailableDeck.push(card); // 添加本次新增卡牌到玩家可选卡池
                 realAddCount += 1; // 实际添加的osu玩家卡牌数量
