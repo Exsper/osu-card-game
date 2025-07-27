@@ -93,15 +93,16 @@ class CardPool {
         }
 
         // 玩家手动挑选卡牌，这里只为敌人随机选择卡牌
-        // 敌人选择2张添加到敌人实际卡池，同时删除(2 - 1)张属性值较低的卡牌，最终新增卡牌数和玩家新增卡牌数相同
+        // 敌人选择3张添加到敌人实际卡池，同时删除(3 - 1)张属性值较低的卡牌，最终新增卡牌数和玩家新增卡牌数相同
         // 因为玩家可以选择1张新卡牌之外，还可以升级卡牌，这样双方水平进步应该比较均衡
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < 3; i++) {
             const index = Math.floor(Math.random() * this.enemyAvailableDeck.length);
             const card = this.enemyAvailableDeck.splice(index, 1)[0];
             this.enemyDeck.push(card);
         }
         // 删除敌人实际卡池中2张属性值较低的卡牌
         this.enemyDeck.sort((a, b) => (a.aim + a.spd + a.acc) - (b.aim + b.spd + b.acc));
+        this.enemyDeck.pop();
         this.enemyDeck.pop();
     }
 
