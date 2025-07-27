@@ -10,6 +10,7 @@
     <script src="./js/CardPool.js"></script>
     <script src="./js/Player.js"></script>
     <script src="./js/Battle.js"></script>
+    <script src="./js/Game.js"></script>
 </head>
 
 <body>
@@ -19,109 +20,186 @@
             <p>底部可查阅详细规则</p>
         </header>
 
-        <div class="game-info">
-            <div class="player-info">
-                <h2>玩家</h2>
-                <div class="health">生命值: <span id="player-health">6</span>/6</div>
-                <div class="health-bar">
-                    <div class="health-fill" id="player-health-bar" style="width: 100%"></div>
+        <!-- 不允许手动切换养成和比赛
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="collection">卡牌养成</button>
+            <button class="tab-btn" data-tab="battle">卡牌对战</button>
+        </div>
+         -->
+
+        <!-- 卡牌养成界面 -->
+        <div id="collection-tab" class="tab-content">
+            <div class="collection-area">
+                <h2 class="collection-title">我的卡牌收藏</h2>
+
+                <div class="collection-stats">
+                    <div class="stat-card">
+                        <div>卡牌总数</div>
+                        <div class="stat-value" id="total-cards">5</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>对战次数</div>
+                        <div class="stat-value" id="battle-count">0</div>
+                    </div>
+                </div>
+
+                <div class="collection-container" id="collection-container">
+                    <!-- 卡牌将通过JS动态生成 -->
                 </div>
             </div>
 
-            <div class="round-info">
-                <h2>回合 <span id="round-number">1</span></h2>
-                <div>卡牌剩余: <span id="cards-left">24</span></div>
+            <div class="collection-actions">
+                <div class="action-card">
+                    <h3 class="action-title">卡牌升级</h3>
+                    <p class="action-desc">选择一张卡牌和两张材料卡牌进行升级，使目标卡牌所有属性+1</p>
+                    <button class="action-btn" id="upgrade-btn">升级卡牌</button>
+                </div>
+
+                <!-- 技能充能卡片内 -->
+                <div class="action-card">
+                    <h3 class="action-title">技能充能</h3>
+                    <p class="action-desc">选择两张材料卡牌为指定技能充能，使该技能使用次数+1</p>
+                    <button class="action-btn" id="recharge-btn">充能技能</button>
+                    <div id="skill-select-group" style="margin-top:10px; display:none;">
+                        <button id="skill-1-btn" class="skill-select-btn" data-skill="reveal">侦察敌情</button>
+                        <button id="skill-2-btn" class="skill-select-btn" data-skill="draw">紧急补给</button>
+                        <button id="skill-3-btn" class="skill-select-btn" data-skill="redraw">重整旗鼓</button>
+                        <button id="skill-4-btn" class="skill-select-btn" data-skill="steal">妙手空空</button>
+                    </div>
+                </div>
+
+                <div class="action-card">
+                    <h3 class="action-title">卡牌丢弃</h3>
+                    <p class="action-desc">选择不需要的卡牌进行丢弃，为你的卡组腾出空间</p>
+                    <button class="action-btn" id="discard-btn">丢弃卡牌</button>
+                </div>
             </div>
 
-            <div class="enemy-info">
-                <h2>电脑</h2>
-                <div class="health">生命值: <span id="enemy-health">6</span>/6</div>
-                <div class="health-bar">
-                    <div class="health-fill" id="enemy-health-bar" style="width: 100%"></div>
-                </div>
+            <div class="action-hint" id="action-hint">请选择卡牌进行操作</div>
+            <div style="text-align:center; margin-top:10px;">
+                <button class="action-btn" id="confirm-action-btn">确认操作</button>
+            </div>
+
+            <div style="text-align:center; margin-top:30px;">
+                <button class="action-btn" id="start-battle-btn">开始新一局比赛</button>
             </div>
         </div>
 
-        <div class="mod-indicator" id="mod-indicator">
-            当前比赛: NM (无MOD)
-        </div>
-
-        <div class="battle-area">
-            <div class="player-area">
-                <h3 class="area-title">你的手牌</h3>
-                <div class="card-container" id="player-hand"></div>
-            </div>
-
-            <div class="enemy-area">
-                <h3 class="area-title">电脑手牌</h3>
-                <div class="card-container" id="enemy-hand"></div>
-            </div>
-        </div>
-
-        <div class="actions">
-            <button id="play-btn" disabled>出牌 (选择1-3张)</button>
-        </div>
-
-        <!-- 技能区域 -->
-        <div class="skills-area">
-            <h3>玩家技能（消耗1点生命值，每个技能每局只能使用一次）</h3>
-            <div class="skills">
-                <div class="skill-card" id="skill1" data-skill="reveal">
-                    <div class="skill-left" id="reveal-skill-count">1</div>
-                    <div class="skill-name">侦察敌情</div>
-                    <div class="skill-desc">显示敌方当前所有手牌，并持续显示这些卡牌（新抽卡牌仍隐藏）</div>
+        <!-- 卡牌对战界面 -->
+        <div id="battle-tab" class="tab-content active">
+            <div class="game-info">
+                <div class="player-info">
+                    <h2>玩家</h2>
+                    <div class="health">生命值: <span id="player-health">6</span>/6</div>
+                    <div class="health-bar">
+                        <div class="health-fill" id="player-health-bar" style="width: 100%"></div>
+                    </div>
                 </div>
 
-                <div class="skill-card" id="skill2" data-skill="draw">
-                    <div class="skill-left" id="draw-skill-count">1</div>
-                    <div class="skill-name">紧急补给</div>
-                    <div class="skill-desc">从剩余牌库中额外抽取2张卡牌</div>
+                <div class="round-info">
+                    <h2>回合 <span id="round-number">1</span></h2>
+                    <div>卡牌剩余: <span id="cards-left">24</span></div>
                 </div>
 
-                <div class="skill-card" id="skill3" data-skill="redraw">
-                    <div class="skill-left" id="redraw-skill-count">1</div>
-                    <div class="skill-name">重整旗鼓</div>
-                    <div class="skill-desc">丢弃所有手牌，重新抽取相同数量的卡牌（注意卡牌剩余数量）</div>
-                </div>
-
-                <div class="skill-card" id="skill4" data-skill="steal">
-                    <div class="skill-left" id="steal-skill-count">1</div>
-                    <div class="skill-name">妙手空空</div>
-                    <div class="skill-desc">从敌人手中偷取1张指定的卡牌（只能在此次对局使用，无法继承）</div>
-                </div>
-            </div>
-            <div class="skill-hint" id="skill-hint">生命值大于1时可以使用技能</div>
-        </div>
-
-        <!-- 回合结果区域 -->
-        <div class="result-area">
-            <div class="result-title">回合结果</div>
-
-            <!-- 战斗结果放在顶部中央 -->
-            <div id="battle-outcome" class="battle-outcome">等待开始...</div>
-
-            <!-- 暴击提示 -->
-            <div id="critical-indicator"></div>
-
-            <!-- 玩家和电脑出牌区域 -->
-            <div class="played-cards-container">
-                <div class="player-cards">
-                    <div class="cards-label">玩家出牌</div>
-                    <div id="player-played" class="played-cards"></div>
-                </div>
-
-                <div class="enemy-cards">
-                    <div class="cards-label">电脑出牌</div>
-                    <div id="enemy-played" class="played-cards"></div>
+                <div class="enemy-info">
+                    <h2>电脑</h2>
+                    <div class="health">生命值: <span id="enemy-health">6</span>/6</div>
+                    <div class="health-bar">
+                        <div class="health-fill" id="enemy-health-bar" style="width: 100%"></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- 详细比较信息 -->
-            <div id="comparison-detail" class="comparison-detail"></div>
-        </div>
+            <div class="mod-indicator" id="mod-indicator">
+                当前比赛: NM (无MOD)
+            </div>
 
-        <div class="actions">
-            <button id="end-turn-btn">下一回合</button>
+            <div class="battle-area">
+                <div class="player-area">
+                    <h3 class="area-title">你的手牌</h3>
+                    <div class="card-container" id="player-hand"></div>
+                </div>
+
+                <div class="enemy-area">
+                    <h3 class="area-title">电脑手牌</h3>
+                    <div class="card-container" id="enemy-hand"></div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button id="play-btn" disabled>出牌 (选择1-3张)</button>
+            </div>
+
+            <!-- 技能区域 -->
+            <div class="skills-area">
+                <h3>玩家技能（消耗1点生命值，每个技能每局只能使用一次）</h3>
+                <div class="skills">
+                    <div class="skill-card" id="skill1" data-skill="reveal">
+                        <div class="skill-left" id="reveal-skill-count">1</div>
+                        <div class="skill-name">侦察敌情</div>
+                        <div class="skill-desc">显示敌方当前所有手牌，并持续显示这些卡牌（新抽卡牌仍隐藏）</div>
+                    </div>
+
+                    <div class="skill-card" id="skill2" data-skill="draw">
+                        <div class="skill-left" id="draw-skill-count">1</div>
+                        <div class="skill-name">紧急补给</div>
+                        <div class="skill-desc">从剩余牌库中额外抽取2张卡牌</div>
+                    </div>
+
+                    <div class="skill-card" id="skill3" data-skill="redraw">
+                        <div class="skill-left" id="redraw-skill-count">1</div>
+                        <div class="skill-name">重整旗鼓</div>
+                        <div class="skill-desc">丢弃所有手牌，重新抽取相同数量的卡牌（注意卡牌剩余数量）</div>
+                    </div>
+
+                    <div class="skill-card" id="skill4" data-skill="steal">
+                        <div class="skill-left" id="steal-skill-count">1</div>
+                        <div class="skill-name">妙手空空</div>
+                        <div class="skill-desc">从敌人手中偷取1张指定的卡牌（只能在此次对局使用，无法继承）</div>
+                    </div>
+                </div>
+                <div class="skill-hint" id="skill-hint">生命值大于1时可以使用技能</div>
+            </div>
+
+            <!-- 回合结果区域 -->
+            <div class="result-area">
+                <div class="result-title">回合结果</div>
+
+                <!-- 战斗结果放在顶部中央 -->
+                <div id="battle-outcome" class="battle-outcome">等待开始...</div>
+
+                <!-- 暴击提示 -->
+                <div id="critical-indicator"></div>
+
+                <!-- 玩家和电脑出牌区域 -->
+                <div class="played-cards-container">
+                    <div class="player-cards">
+                        <div class="cards-label">玩家出牌</div>
+                        <div id="player-played" class="played-cards"></div>
+                    </div>
+
+                    <div class="enemy-cards">
+                        <div class="cards-label">电脑出牌</div>
+                        <div id="enemy-played" class="played-cards"></div>
+                    </div>
+                </div>
+
+                <!-- 详细比较信息 -->
+                <div id="comparison-detail" class="comparison-detail"></div>
+            </div>
+
+            <div class="actions">
+                <button id="end-turn-btn">下一回合</button>
+            </div>
+
+            <!-- 奖励选择界面 -->
+            <div class="reward-area" id="reward-area">
+                <h2 class="reward-title">对战胜利奖励！请选择一张卡牌加入卡包</h2>
+                <div class="reward-cards" id="reward-cards">
+                    <!-- 奖励卡牌将通过JS动态生成 -->
+                </div>
+                <div class="reward-hint">选择一张卡牌后，它将自动加入你的卡包</div>
+            </div>
         </div>
 
         <div class="instructions">
@@ -141,7 +219,8 @@
             <h3>下一步计划</h3>
             <ul>
                 <li>结合卡牌养成模式（进行中，若网页有bug请见谅）</li>
-                <li>将更多现实玩家加入卡组，欢迎<a href="https://github.com/Exsper/osu-card-game/issues" target="_blank">报名</a>，提供osuId、aim、spd、acc和擅长mod</li>
+                <li>将更多现实玩家加入卡组，欢迎<a href="https://github.com/Exsper/osu-card-game/issues"
+                        target="_blank">报名</a>，提供osuId、aim、spd、acc和擅长mod</li>
                 <li>欢迎提出任何<a href="https://github.com/Exsper/osu-card-game/issues" target="_blank">意见和建议</a></li>
             </ul>
         </div>
@@ -150,10 +229,8 @@
     <script>
         // 初始化游戏
         document.addEventListener('DOMContentLoaded', () => {
-            // 创建卡池
-            const cardPool = new CardPool();
-            const player = new Player();
-            const game = new Battle(cardPool, player, true); // true表示使用真实玩家
+            window.game = new Game(true);
+            window.game.startBattle();
         });
     </script>
 </body>

@@ -12,13 +12,13 @@ class Player {
     /**
      * 获胜后可以在N张卡牌中选择1张加入卡池，提供给玩家选择
      * @param {CardPool} cardPool 
-     * @param {number} shwoCards 展示的卡牌数量，默认为3
+     * @param {number} showCards 展示的卡牌数量，默认为3
      * @returns 
      */
-    generateRewardCards(cardPool, shwoCards = 3) {
+    generateRewardCards(cardPool, showCards = 3) {
         const rewards = [];
-        // 从cardPool.playerAvailableDeck中随机抽取shwoCards张不同的卡牌作为选项，因为只是展示给玩家挑选1张，所以此时不对playerAvailableDeck做改动
-        let showCount = Math.min(cardPool.playerAvailableDeck.length, shwoCards);
+        // 从cardPool.playerAvailableDeck中随机抽取showCards张不同的卡牌作为选项，因为只是展示给玩家挑选1张，所以此时不对playerAvailableDeck做改动
+        let showCount = Math.min(cardPool.playerAvailableDeck.length, showCards);
         for (let i = 0; i < showCount; i++) {
             const index = Math.floor(Math.random() * cardPool.playerAvailableDeck.length);
             const card = cardPool.playerAvailableDeck[index];

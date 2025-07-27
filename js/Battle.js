@@ -1,11 +1,13 @@
 class Battle {
     /**
      * 单次对战类，负责处理玩家和电脑的对战逻辑
+     * @param {num} id 比赛ID（从0开始）
      * @param {CardPool} cardPool 整个游戏的全部卡牌
      * @param {Player} player 玩家对象
      * @param {boolean} useRealPlayers 是否使用真实玩家数据
      */
-    constructor(cardPool, player, useRealPlayers = false) {
+    constructor(id, cardPool, player, useRealPlayers = false) {
+        this.id = id;
         this.cardPool = cardPool;
         this.player = player;
         this.useRealPlayers = useRealPlayers; // 是否使用真实玩家数据
@@ -31,6 +33,8 @@ class Battle {
         };
         this.stealMode = false; // 是否处于偷取模式
         this.revealedEnemyCards = []; // 被侦察显示的敌方卡牌
+
+        this.isPlayerWin = -1;  // 1=playerwin 0=enemywin -1=undergoing
 
         // DOM元素引用
         this.playerHandEl = document.getElementById('player-hand');
@@ -92,6 +96,7 @@ class Battle {
         };
         this.stealMode = false;
         this.revealedEnemyCards = [];
+        this.isPlayerWin = -1;
 
         // 从cardPool中深拷贝玩家和敌人的卡池，对战中不能影响玩家实际卡池（偷取技能也只针对本局游戏）
         this.playerDeck = this.cardPool.playerDeck.map(card => new Card(card.id, {
@@ -316,7 +321,10 @@ class Battle {
 
         // 显示下一回合按钮
         this.endTurnBtn.disabled = false;
-        if (this.gameOver) this.endTurnBtn.textContent = '重新开始';
+        if (this.gameOver) {
+            if (this.isPlayerWin) this.endTurnBtn.textContent = '选择奖励';
+            else this.endTurnBtn.textContent = '重新开始';
+        }
         else this.endTurnBtn.textContent = '下一回合';
 
         this.updateSkillsState();
@@ -536,7 +544,8 @@ class Battle {
             this.battleOutcome.className = `battle-outcome ${outcomeClass}`;
             this.playBtn.disabled = true;
             this.endTurnBtn.disabled = false;
-            this.endTurnBtn.textContent = '重新开始';
+            this.isPlayerWin = 1;
+            this.endTurnBtn.textContent = '选择奖励';
             return true;
         }
 
@@ -548,6 +557,7 @@ class Battle {
             this.battleOutcome.className = `battle-outcome ${outcomeClass}`;
             this.playBtn.disabled = true;
             this.endTurnBtn.disabled = false;
+            this.isPlayerWin = 0;
             this.endTurnBtn.textContent = '重新开始';
             return true;
         }
@@ -555,14 +565,43 @@ class Battle {
         return false;
     }
 
+    clearListeners() {
+        // 清除所有按钮事件
+        const btnIds = [
+            'play-btn',
+            'end-turn-btn',
+            'skill1',
+            'skill2',
+            'skill3',
+            'skill4',
+        ];
+        btnIds.forEach(id => {
+            const oldBtn = document.getElementById(id);
+            if (oldBtn) {
+                const newBtn = oldBtn.cloneNode(true); // true表示深拷贝（不带事件）
+                oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+            }
+        });
+    }
+
     endGame() {
-        // 游戏已结束，如果获胜则进入挑选奖励卡牌环节，但是现在还没做，所以为了测试其他项目先重开吧
-        // 临时措施，为了测试其他功能，直接重置游戏
-        this.player.skillCounts.reveal = 1;
-        this.player.skillCounts.draw = 1;
-        this.player.skillCounts.redraw = 1;
-        this.player.skillCounts.steal = 1;
-        this.initGame();
+        // 游戏已结束，如果获胜则进入挑选奖励卡牌环节，如果失败则游戏重置
+        /*
+            单局测试用
+            this.player.skillCounts.reveal = 1;
+            this.player.skillCounts.draw = 1;
+            this.player.skillCounts.redraw = 1;
+            this.player.skillCounts.steal = 1;
+            this.initGame();
+        */
+        if (this.isPlayerWin === 1) {
+            window.game.battleCount += 1;
+            window.game.showRewardScreen();
+        }
+        else {
+            this.clearListeners();
+            window.game.restart();
+        }
     }
 
     // 到下一回合
@@ -631,6 +670,7 @@ class Battle {
         if (this.playerHealth <= 0 || this.enemyHealth <= 0) {
             this.gameOver = true;
             const winner = this.playerHealth <= 0 ? "电脑" : "玩家";
+            this.isPlayerWin = this.playerHealth <= 0 ? 0 : 1;
             this.battleOutcome.textContent = `游戏结束! ${winner}获胜!`;
             this.playBtn.disabled = true;
         }

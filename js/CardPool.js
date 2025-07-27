@@ -44,9 +44,9 @@ class CardPool {
         this.progress += 1; // 每次添加卡牌增加1点进度
 
         // 只保留玩家可选卡池中的osu玩家卡牌，其他以前的可选卡牌全部删除
-        this.playerAvailableDeck = this.playerAvailableDeck.filter(c => c.userId !== player.userId);
+        this.playerAvailableDeck = this.playerAvailableDeck.filter(c => c.userId > 0);
         // 只保留敌人可选卡池中的osu玩家卡牌，其他以前的可选卡牌全部删除（理论上敌人不可能拥有osu玩家卡牌，但是以后如果会给敌人设置技能系统就不一定了）
-        this.enemyAvailableDeck = this.enemyAvailableDeck.filter(c => c.userId !== player.userId);
+        this.enemyAvailableDeck = this.enemyAvailableDeck.filter(c => c.userId > 0);
 
         // 添加osu玩家卡牌
         let realAddCount = 0; // 实际添加的osu玩家卡牌数量
