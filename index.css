@@ -23,6 +23,104 @@ body {
     overflow-x: hidden;
 }
 
+/* 防止双击放大 */
+* {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 增强移动端点击反馈 */
+.card,
+.action-btn,
+.skill-card,
+.tab-btn {
+    transition: transform 0.1s ease;
+}
+
+.card:active,
+.action-btn:active,
+.skill-card:active,
+.tab-btn:active {
+    transform: scale(0.95);
+}
+
+/* 移动端优化布局 */
+@media (max-width: 768px) {
+    .game-info {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .player-info,
+    .enemy-info {
+        width: 100%;
+        max-width: 300px;
+        margin-bottom: 15px;
+    }
+
+    .card {
+        width: 120px;
+        height: 160px;
+        font-size: 0.8rem;
+    }
+
+    .stat {
+        padding: 3px 5px;
+    }
+
+    .stat-value {
+        font-size: 0.9rem;
+    }
+
+    .player-name {
+        font-size: 0.75rem;
+    }
+
+    .action-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+
+    .battle-area {
+        flex-direction: column;
+    }
+
+    .player-area,
+    .enemy-area {
+        margin-bottom: 20px;
+    }
+
+    .skills {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .skill-card {
+        width: 100%;
+        max-width: 300px;
+        margin-bottom: 15px;
+    }
+}
+
+/* 点击反馈动画 */
+@keyframes tap-feedback {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(0.95);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.tap-feedback {
+    animation: tap-feedback 0.2s ease;
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;

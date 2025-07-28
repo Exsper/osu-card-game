@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>osu! 卡牌对战（测试版）</title>
     <link href="./index.css" rel="stylesheet">
     <script src="./js/Card.js"></script>
@@ -90,7 +90,8 @@
             <div class="game-info">
                 <div class="player-info">
                     <h2>玩家</h2>
-                    <div class="health">生命值: <span id="player-health">6</span>/<span id="player-fullhealth">6</span></div>
+                    <div class="health">生命值: <span id="player-health">6</span>/<span id="player-fullhealth">6</span>
+                    </div>
                     <div class="health-bar">
                         <div class="health-fill" id="player-health-bar" style="width: 100%"></div>
                     </div>
@@ -225,6 +226,40 @@
             </ul>
         </div>
     </div>
+
+    <script>
+        // 点击反馈处理
+        function addTapFeedback(element) {
+            if (!element) return;
+
+            element.addEventListener('touchstart', function (e) {
+                // 防止触摸事件触发滚动
+                if (e.touches.length > 1) e.preventDefault();
+
+                this.classList.add('tap-feedback');
+            });
+
+            element.addEventListener('touchend', function () {
+                this.classList.remove('tap-feedback');
+            });
+        }
+
+        // 初始化游戏
+        document.addEventListener('DOMContentLoaded', () => {
+            window.game = new Game(true);
+            window.game.startBattle();
+
+            // 为所有可点击元素添加反馈
+            document.querySelectorAll('.card, .action-btn, .skill-card, .tab-btn').forEach(el => {
+                addTapFeedback(el);
+            });
+
+            // 防止双击缩放
+            document.addEventListener('dblclick', function (e) {
+                e.preventDefault();
+            });
+        });
+    </script>
 
     <script>
         // 初始化游戏
