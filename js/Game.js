@@ -116,7 +116,15 @@ class Game {
     createCollectionCard(card) {
         const cardEl = document.createElement('div');
         cardEl.className = 'card';
-        if (this.selectedCards.includes(card.id)) {
+
+        // 区分升级目标和素材
+        if (this.selectedAction === 'upgrade' && this.selectedCards.length > 0) {
+            if (this.selectedCards[0] === card.id) {
+                cardEl.classList.add('collection-upgrade-target');
+            } else if (this.selectedCards.includes(card.id)) {
+                cardEl.classList.add('collection-upgrade-material');
+            }
+        } else if (this.selectedCards.includes(card.id)) {
             cardEl.classList.add('collection-selected');
         }
 
@@ -149,12 +157,15 @@ class Game {
                 // 选择目标卡
                 this.selectedCards = [card.id];
                 this.actionHint.textContent = `已选择目标卡牌: ${(this.useRealPlayers && card.userId > 0) ? card.userName : "ID: " + card.id}，请选择两张材料卡牌`;
+            } else if (this.selectedCards[0] === card.id) {
+                // 再次点击目标卡，清空所有选中
+                this.selectedCards = [];
+            } else if (this.selectedCards.includes(card.id)) {
+                // 再次点击素材卡，只移除该卡
+                this.selectedCards = this.selectedCards.filter(id => id !== card.id);
             } else if (this.selectedCards.length < 3) {
                 // 选择材料卡（不能选择目标卡）
-                if (this.selectedCards[0] !== card.id && !this.selectedCards.includes(card.id)) {
-                    this.selectedCards.push(card.id);
-                }
-
+                this.selectedCards.push(card.id);
                 if (this.selectedCards.length === 3) {
                     this.actionHint.textContent = `已选择目标卡牌和两张材料卡牌，点击“确认”按钮以升级`;
                 }
@@ -283,10 +294,11 @@ class Game {
         // 升级按钮
         this.upgradeBtn.addEventListener('click', () => {
             this.skillSelectGroup.style.display = 'none';
-            if (this.selectedAction && this.selectedAction !== 'upgrade') {
-                this.selectedCards = []; // 清空选中卡牌
-                this.renderCollection();  // 重新渲染卡牌
-            }
+            // 强制清空选中卡牌
+            //if (this.selectedAction && this.selectedAction !== 'upgrade') {
+            this.selectedCards = []; // 清空选中卡牌
+            this.renderCollection();  // 重新渲染卡牌
+            //}
             this.selectedAction = 'upgrade';
             this.actionHint.textContent = "请选择要升级的目标卡牌";
 
@@ -295,11 +307,10 @@ class Game {
         // 技能充能按钮
         this.rechargeBtn.addEventListener('click', () => {
             if (this.selectedAction && this.selectedAction !== 'recharge') {
+                this.selectedAction = 'recharge';
                 this.selectedCards = []; // 清空选中卡牌
                 this.renderCollection();  // 重新渲染卡牌
             }
-            this.selectedAction = 'recharge';
-            this.selectedCards = []; // 清空选中卡牌
             if (this.selectedCards.length !== 2) {
                 this.actionHint.textContent = "请选择两张材料卡牌";
                 return;
@@ -341,10 +352,11 @@ class Game {
         // 丢弃按钮
         this.discardBtn.addEventListener('click', () => {
             this.skillSelectGroup.style.display = 'none';
-            if (this.selectedAction && this.selectedAction !== 'discard') {
-                this.selectedCards = []; // 清空选中卡牌
-                this.renderCollection();  // 重新渲染卡牌
-            }
+            // 强制清空选中卡牌
+            //if (this.selectedAction && this.selectedAction !== 'discard') {
+            this.selectedCards = []; // 清空选中卡牌
+            this.renderCollection();  // 重新渲染卡牌
+            //}
             this.selectedAction = 'discard';
             this.actionHint.textContent = "请选择要丢弃的卡牌";
         });

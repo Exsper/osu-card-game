@@ -263,6 +263,46 @@ h1 {
     box-shadow: 0 0 20px var(--warning) !important;
 }
 
+.card.collection-upgrade-target {
+    border: 3px solid #2ed573 !important;
+    /* 绿色边框 */
+    box-shadow: 0 0 20px #2ed573 !important;
+    position: relative;
+}
+
+.card.collection-upgrade-target::after {
+    content: "目标";
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: #2ed573;
+    color: #fff;
+    font-size: 0.9em;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
+.card.collection-upgrade-material {
+    border: 3px solid #ffa502 !important;
+    /* 橙色边框 */
+    box-shadow: 0 0 20px #ffa502 !important;
+    position: relative;
+}
+
+.card.collection-upgrade-material::after {
+    content: "素材";
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: #ffa502;
+    color: #fff;
+    font-size: 0.9em;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
 .card-header {
     display: flex;
     justify-content: space-between;
