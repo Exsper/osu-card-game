@@ -20,12 +20,10 @@
             <p>底部可查阅详细规则</p>
         </header>
 
-        <!-- 不允许手动切换养成和比赛
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="collection">卡牌养成</button>
-            <button class="tab-btn" data-tab="battle">卡牌对战</button>
+        <div id="collection-shop-switch" class="tabs hide">
+            <button class="tab-btn active" data-tab="collection">卡牌管理</button>
+            <button class="tab-btn" data-tab="shop">商店（未实装）</button>
         </div>
-         -->
 
         <!-- 卡牌养成界面 -->
         <div id="collection-tab" class="tab-content">
@@ -83,6 +81,14 @@
 
             <div style="text-align:center; margin-top:30px;">
                 <button class="action-btn" id="start-battle-btn">开始新一局比赛</button>
+            </div>
+        </div>
+
+        <!-- 商店界面 -->
+        <div id="shop-tab" class="tab-content">
+            <div class="shop-area">
+                <h2 class="shop-title">商店</h2>
+                <!-- TODO -->
             </div>
         </div>
 
@@ -221,6 +227,7 @@
             </ul>
             <h3>下一步计划</h3>
             <ul>
+                <li>商店和金币系统</li>
                 <li>将更多现实玩家作为彩蛋加入卡组，欢迎<a href="https://bbs.hiosu.com/thread-1325-1-1.html"
                         target="_blank">报名</a>，提供osuId、aim、spd、acc和擅长mod</li>
                 <li>欢迎提出任何<a href="https://github.com/Exsper/osu-card-game/issues" target="_blank">意见和建议</a></li>

@@ -882,7 +882,6 @@ button:disabled {
 }
 
 /* 标签页样式 */
-/* 不允许手动切换养成和比赛
 .tabs {
     display: flex;
     justify-content: center;
@@ -912,7 +911,7 @@ button:disabled {
 .tab-btn:hover:not(.active) {
     background: rgba(255, 255, 255, 0.2);
 }
-*/
+
 
 .tab-content {
     display: none;

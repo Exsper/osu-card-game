@@ -24,8 +24,8 @@ class Game {
 
     initUIReferences() {
         // 标签页切换
-        // this.tabBtns = document.querySelectorAll('.tab-btn');
-        // this.tabContents = document.querySelectorAll('.tab-content');
+        this.tabBtns = document.querySelectorAll('.tab-btn');
+        this.tabContents = document.querySelectorAll('.tab-content');
 
         // 收藏界面元素
         this.collectionContainer = document.getElementById('collection-container');
@@ -74,6 +74,8 @@ class Game {
 
     startBattle() {
         // 切换到对战界面
+        document.getElementById('collection-shop-switch').classList.add('hide');
+        document.getElementById('shop-tab').classList.remove('active');
         document.getElementById('collection-tab').classList.remove('active');
         document.getElementById('battle-tab').classList.add('active');
         this.gameState = 'battle';
@@ -272,6 +274,7 @@ class Game {
             // 切换到养成界面
             document.getElementById('battle-tab').classList.remove('active');
             document.getElementById('collection-tab').classList.add('active');
+            document.getElementById('collection-shop-switch').classList.remove('hide');
 
             // 提示用户
             this.actionHint.textContent = `已添加新卡牌: ${(this.useRealPlayers && card.userId > 0) ? card.userName : "ID: " + card.id} 到你的收藏！`;
@@ -282,7 +285,6 @@ class Game {
 
     bindEvents() {
         // 标签页切换
-        /*
         this.tabBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const tab = btn.dataset.tab;
@@ -296,7 +298,6 @@ class Game {
                 document.getElementById(`${tab}-tab`).classList.add('active');
             });
         });
-        */
 
         // 升级按钮
         this.upgradeBtn.addEventListener('click', () => {
