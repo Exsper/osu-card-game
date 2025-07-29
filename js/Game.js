@@ -37,6 +37,7 @@ class Game {
         this.actionHint = document.getElementById('action-hint');
         this.startBattleBtn = document.getElementById('start-battle-btn');
         this.confirmActionBtn = document.getElementById('confirm-action-btn');
+        this.cancelActionBtn = document.getElementById('cancel-action-btn');
 
         // 奖励界面元素
         this.rewardArea = document.getElementById('reward-area');
@@ -60,6 +61,7 @@ class Game {
             'skill-3-btn',
             'skill-4-btn',
             'confirm-action-btn',
+            'cancel-action-btn',
         ];
         btnIds.forEach(id => {
             const oldBtn = document.getElementById(id);
@@ -218,6 +220,11 @@ class Game {
 
         const targetCard = this.cardPool.playerDeck.find(card => card.id === targetId);
         this.actionHint.textContent = `成功升级 ${(this.useRealPlayers && targetCard.userId > 0) ? targetCard.userName : "ID: " + targetCard.id} ！`;
+        // 恢复操作按钮
+        this.upgradeBtn.disabled = false;
+        this.rechargeBtn.disabled = false;
+        this.discardBtn.disabled = false;
+        this.cancelActionBtn.disabled = true;
     }
 
     updateStats() {
@@ -294,30 +301,31 @@ class Game {
         // 升级按钮
         this.upgradeBtn.addEventListener('click', () => {
             this.skillSelectGroup.style.display = 'none';
-            // 强制清空选中卡牌
-            //if (this.selectedAction && this.selectedAction !== 'upgrade') {
-            this.selectedCards = []; // 清空选中卡牌
-            this.renderCollection();  // 重新渲染卡牌
-            //}
+            this.selectedCards = [];
+            this.renderCollection();
             this.selectedAction = 'upgrade';
             this.actionHint.textContent = "请选择要升级的目标卡牌";
-
+            // 禁用其他操作按钮
+            this.upgradeBtn.disabled = true;
+            this.rechargeBtn.disabled = true;
+            this.discardBtn.disabled = true;
+            this.cancelActionBtn.disabled = false;
         });
 
         // 技能充能按钮
         this.rechargeBtn.addEventListener('click', () => {
             if (this.selectedAction && this.selectedAction !== 'recharge') {
                 this.selectedAction = 'recharge';
-                this.selectedCards = []; // 清空选中卡牌
-                this.renderCollection();  // 重新渲染卡牌
+                this.selectedCards = [];
+                this.renderCollection();
             }
-            if (this.selectedCards.length !== 2) {
-                this.actionHint.textContent = "请选择两张材料卡牌";
-                return;
-            }
-            // 显示技能选择按钮组
-            this.skillSelectGroup.style.display = 'block';
-            this.actionHint.textContent = "请选择要充能的技能类型";
+            this.skillSelectGroup.style.display = 'none';
+            this.actionHint.textContent = "请选择两张材料卡牌";
+            // 禁用其他操作按钮
+            this.upgradeBtn.disabled = true;
+            this.rechargeBtn.disabled = true;
+            this.discardBtn.disabled = true;
+            this.cancelActionBtn.disabled = false;
         });
 
         // 技能选择按钮组事件
@@ -346,19 +354,26 @@ class Game {
                     default: { skillString = "未知技能"; break; }
                 }
                 this.actionHint.textContent = `成功为技能【${skillString}】充能！`;
+                // 恢复操作按钮
+                this.upgradeBtn.disabled = false;
+                this.rechargeBtn.disabled = false;
+                this.discardBtn.disabled = false;
+                this.cancelActionBtn.disabled = true;
             });
         });
 
         // 丢弃按钮
         this.discardBtn.addEventListener('click', () => {
             this.skillSelectGroup.style.display = 'none';
-            // 强制清空选中卡牌
-            //if (this.selectedAction && this.selectedAction !== 'discard') {
-            this.selectedCards = []; // 清空选中卡牌
-            this.renderCollection();  // 重新渲染卡牌
-            //}
+            this.selectedCards = [];
+            this.renderCollection();
             this.selectedAction = 'discard';
             this.actionHint.textContent = "请选择要丢弃的卡牌";
+            // 禁用其他操作按钮
+            this.upgradeBtn.disabled = true;
+            this.rechargeBtn.disabled = true;
+            this.discardBtn.disabled = true;
+            this.cancelActionBtn.disabled = false;
         });
 
         // 确认按钮
@@ -388,13 +403,40 @@ class Game {
                 this.renderCollection();
                 this.updateStats();
                 this.actionHint.textContent = "卡牌已丢弃";
+                // 恢复操作按钮
+                this.upgradeBtn.disabled = false;
+                this.rechargeBtn.disabled = false;
+                this.discardBtn.disabled = false;
+                this.cancelActionBtn.disabled = true;
             } else {
                 this.actionHint.textContent = "请先选择操作类型";
             }
         });
 
+        // 取消操作按钮
+        this.cancelActionBtn.addEventListener('click', () => {
+            this.selectedCards = [];
+            this.selectedAction = null;
+            this.skillSelectGroup.style.display = 'none';
+            this.actionHint.textContent = "请选择卡牌进行操作";
+            this.renderCollection();
+            // 恢复操作按钮
+            this.upgradeBtn.disabled = false;
+            this.rechargeBtn.disabled = false;
+            this.discardBtn.disabled = false;
+            this.cancelActionBtn.disabled = true;
+        });
+
+        // 初始化时禁用取消按钮
+        this.cancelActionBtn.disabled = true;
+
         // 新一局比赛按钮
         this.startBattleBtn.addEventListener('click', () => {
+            // 恢复操作按钮
+            this.upgradeBtn.disabled = false;
+            this.rechargeBtn.disabled = false;
+            this.discardBtn.disabled = false;
+            this.cancelActionBtn.disabled = true;
             this.battleCount += 1;
             this.cardPool.createMoreDeck();
             this.startBattle();
