@@ -1,5 +1,6 @@
 class Player {
     constructor() {
+        this.gold = 100; // 初始金币
         // 技能使用次数
         this.skillCounts = {
             reveal: 1,
@@ -115,6 +116,18 @@ class Player {
 
         // 从玩家实际卡池中删除卡牌
         cardPool.playerDeck.splice(cardIndex, 1);
+        return true;
+    }
+
+    // 添加金币
+    addGold(amount) {
+        this.gold += amount;
+    }
+
+    // 消费金币
+    spendGold(amount) {
+        if (this.gold < amount) return false;
+        this.gold -= amount;
         return true;
     }
 }

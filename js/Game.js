@@ -148,12 +148,12 @@ class Game {
      */
     toggleCardSelection(card) {
         if (this.selectedAction === 'discard') {
-            // 丢弃卡牌 - 只需要选择一张
+            // 出售卡牌 - 只需要选择一张
             if (this.selectedCards.length > 0 && this.selectedCards[0] === card.id) {
                 this.selectedCards = [];
             } else {
                 this.selectedCards = [card.id];
-                this.actionHint.textContent = `已选择卡牌，点击“确认”按钮以丢弃`;
+                this.actionHint.textContent = `已选择卡牌，点击“确认”按钮以出售`;
             }
         } else if (this.selectedAction === 'upgrade') {
             // 升级卡牌 - 先选目标卡，再选材料卡
@@ -363,13 +363,13 @@ class Game {
             });
         });
 
-        // 丢弃按钮
+        // 出售按钮
         this.discardBtn.addEventListener('click', () => {
             this.skillSelectGroup.style.display = 'none';
             this.selectedCards = [];
             this.renderCollection();
             this.selectedAction = 'discard';
-            this.actionHint.textContent = "请选择要丢弃的卡牌";
+            this.actionHint.textContent = "请选择要出售的卡牌";
             // 禁用其他操作按钮
             this.upgradeBtn.disabled = true;
             this.rechargeBtn.disabled = true;
@@ -391,19 +391,20 @@ class Game {
                 this.actionHint.textContent = "请选择要充能的技能类型";
             } else if (this.selectedAction === 'discard') {
                 if (this.selectedCards.length !== 1) {
-                    this.actionHint.textContent = "请选择要丢弃的卡牌";
+                    this.actionHint.textContent = "请选择要出售的卡牌";
                     return;
                 }
                 let success = this.player.removeCard(this.cardPool, this.selectedCards[0]);
                 if (!success) {
-                    this.actionHint.textContent = "丢弃失败，请重试";
+                    this.actionHint.textContent = "出售失败，请重试";
                     return;
                 }
                 this.selectedCards = [];
                 this.selectedAction = null;
+                this.player.addGold(15);
                 this.renderCollection();
                 this.updateStats();
-                this.actionHint.textContent = "卡牌已丢弃";
+                this.actionHint.textContent = "卡牌已出售";
                 // 恢复操作按钮
                 this.upgradeBtn.disabled = false;
                 this.rechargeBtn.disabled = false;

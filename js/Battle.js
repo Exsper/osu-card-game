@@ -39,7 +39,7 @@ class Battle {
 
         this.isPlayerWin = -1;  // 1=playerwin 0=enemywin -1=undergoing
 
-
+        this.clearListeners();
         this.initUIReferences();
         this.bindEvents();
 
@@ -638,6 +638,8 @@ class Battle {
         */
         if (this.isPlayerWin === 1) {
             // window.game.battleCount += 1;
+            // 奖励 局数*50 的金钱
+            this.player.addGold((this.id + 1) * 50);
             this.showRewardPhase();
             window.game.showRewardScreen();
         }
