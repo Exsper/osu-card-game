@@ -399,7 +399,24 @@ h1 {
 }
 
 .card-mod.highlight {
-    background: #ffa502;
+    border: 2px solid rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 1) !important;
+}
+
+.card-mod.EZ {
+    background-color: #14a57d;
+}
+
+.card-mod.HR {
+    background-color: #e74141;
+}
+
+.card-mod.HD {
+    background-color: #2a85e1;
+}
+
+.card-mod.DT {
+    background-color: #934bdf;
 }
 
 .card-stats {

@@ -800,10 +800,10 @@ class Battle {
 
         // 根据MOD改变指示器颜色
         const modColors = {
-            'NM': '#a29bfe',
+            'NM': '#ffffff',
             'HR': '#ff7675',
             'EZ': '#55efc4',
-            'DT': '#fdcb6e',
+            'DT': '#d19bfe',
             'HD': '#74b9ff'
         };
         this.modIndicator.style.background = `rgba(0, 0, 0, 0.3)`;

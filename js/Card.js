@@ -167,7 +167,7 @@ class Card {
         return `
             ${playerInfo}
             <div class="card-header">
-                <div class="card-mod ${this.mod === currentMod ? 'highlight' : ''}">${this.mod}</div>
+                <div class="card-mod ${this.mod} ${this.mod === currentMod ? 'highlight' : ''}">${this.mod}</div>
             </div>
             <div class="card-stats">
                 <div class="stat">
