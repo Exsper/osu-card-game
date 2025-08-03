@@ -653,9 +653,6 @@ class Battle {
     endTurn() {
         // 更新按钮状态
         this.playBtn.disabled = this.selectedCards.length === 0 || this.gameOver;
-        this.playBtn.textContent = this.isTB ?
-            `出牌 (选择1-4张)` :
-            `出牌 (选择1-3张)`;
         this.endTurnBtn.disabled = true;
 
         if (this.gameOver) {
@@ -685,6 +682,9 @@ class Battle {
 
         // 检查是否进入TB模式
         this.isTB = (this.playerHealth === 1 && this.enemyHealth === 1);
+        this.playBtn.textContent = this.isTB ?
+            `出牌 (选择1-4张)` :
+            `出牌 (选择1-3张)`;
 
         // 随机环境MOD
         this.setRandomMod();
