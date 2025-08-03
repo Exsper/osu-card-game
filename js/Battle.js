@@ -973,6 +973,8 @@ class Battle {
         // 清空选择
         this.selectedCards = [];
 
+        this.updateSelectedStats();
+
         // 重新渲染玩家手牌
         this.renderCards();
 
