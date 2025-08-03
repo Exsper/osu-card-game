@@ -72,6 +72,10 @@ class Battle {
         this.drawSkillCount = document.getElementById('draw-skill-count');
         this.redrawSkillCount = document.getElementById('redraw-skill-count');
         this.stealSkillCount = document.getElementById('steal-skill-count');
+        this.selectedAimEl = document.getElementById('selected-aim');
+        this.selectedSpdEl = document.getElementById('selected-spd');
+        this.selectedAccEl = document.getElementById('selected-acc');
+        this.selectedStatsEl = document.getElementById('selected-stats');
 
         // 获取技能卡片元素
         this.skill1 = document.getElementById('skill1');
@@ -133,6 +137,9 @@ class Battle {
 
         // 初始抽牌
         this.drawInitialCards();
+
+        // 初始化属性总和显示
+        this.updateSelectedStats();
 
         // 随机环境MOD
         this.setRandomMod();
@@ -325,6 +332,53 @@ class Battle {
 
         // 重新渲染手牌以更新选中状态
         this.renderCards();
+
+        // 更新属性总和显示
+        this.updateSelectedStats();
+    }
+
+    // 更新选中卡牌属性总和
+    updateSelectedStats() {
+        let aim = 0, spd = 0, acc = 0;
+
+        // 计算选中卡牌的总属性值
+        this.selectedCards.forEach(cardId => {
+            const card = this.playerHand.find(c => c.id === cardId);
+            if (card) {
+                const multiplier = (card.mod === this.currentMod) ? this.modMultiplier : 1;
+                aim += card.aim * multiplier;
+                spd += card.spd * multiplier;
+                acc += card.acc * multiplier;
+            }
+        });
+
+        // 更新UI
+        this.selectedAimEl.textContent = parseFloat(aim.toFixed(1));
+        this.selectedSpdEl.textContent = parseFloat(spd.toFixed(1));
+        this.selectedAccEl.textContent = parseFloat(acc.toFixed(1));
+
+        // 标记最大值
+        let max = Math.max(aim, spd, acc);
+        if (max > 0) {
+            if (max == aim) {
+                this.selectedAimEl.classList.add("top");
+                this.selectedSpdEl.classList.remove("top");
+                this.selectedAccEl.classList.remove("top");
+            }
+            else if (max == spd) {
+                this.selectedAimEl.classList.remove("top");
+                this.selectedSpdEl.classList.add("top");
+                this.selectedAccEl.classList.remove("top");
+            }
+            else if (max == acc) {
+                this.selectedAimEl.classList.remove("top");
+                this.selectedSpdEl.classList.remove("top");
+                this.selectedAccEl.classList.add("top");
+            }
+        }
+
+        // 显示/隐藏统计区域
+        this.selectedStatsEl.style.display = this.selectedCards.length > 0 ? 'flex' : 'none';
     }
 
     // 玩家出牌后
@@ -356,6 +410,9 @@ class Battle {
         // 清空选择
         this.selectedCards = [];
         this.playBtn.disabled = true;
+
+        // 重置属性总和显示
+        this.updateSelectedStats();
 
         // 显示下一回合按钮
         this.endTurnBtn.disabled = false;

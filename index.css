@@ -203,6 +203,59 @@ h1 {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
+.selected-stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+    .selected-stats {
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+    }
+}
+
+.stat-sum {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.stat-sum.aim {
+    background: rgba(255, 107, 107, 0.3);
+}
+
+.stat-sum.aim:has(.top) {
+    border: 2px solid #ff6b6b;
+}
+
+.stat-sum.spd {
+    background: rgba(155, 89, 182, 0.3);
+}
+
+.stat-sum.spd:has(.top) {
+    border: 2px solid #9b59b6;
+}
+
+.stat-sum.acc {
+    background: rgba(46, 204, 113, 0.3);
+}
+
+.stat-sum.acc:has(.top) {
+    border: 2px solid #2ecc71;
+}
+
 .area-title {
     text-align: center;
     margin-bottom: 20px;
