@@ -489,9 +489,9 @@ class Battle {
         // 找出最大值
         const maxValue = Math.max(stats.aim, stats.spd, stats.acc);
         let result = `
-        <div class='result-sum'>Aim=${stats.aim}${stats.aim === maxValue ? '（最高）' : ''}</div>
-        <div class='result-sum'>Spd=${stats.spd}${stats.spd === maxValue ? '（最高）' : ''}</div>
-        <div class='result-sum'>Acc=${stats.acc}${stats.acc === maxValue ? '（最高）' : ''}</div>
+        <div class='result-sum aim ${stats.aim === maxValue ? 'top' : ''}'>Aim=${stats.aim}${stats.aim === maxValue ? '（最高）' : ''}</div>
+        <div class='result-sum spd ${stats.spd === maxValue ? 'top' : ''}'>Spd=${stats.spd}${stats.spd === maxValue ? '（最高）' : ''}</div>
+        <div class='result-sum acc ${stats.acc === maxValue ? 'top' : ''}'>Acc=${stats.acc}${stats.acc === maxValue ? '（最高）' : ''}</div>
     `;
         return result;
     }

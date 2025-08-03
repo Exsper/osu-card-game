@@ -614,6 +614,36 @@ button:disabled {
 .result-sum {
     width: 100%;
     text-align: center;
+    border-radius: 5px;
+    padding: 4px;
+    font-size: 1.1em;
+}
+
+.result-sum.aim {
+    background: rgba(255, 107, 107, 0.3);
+}
+
+.result-sum.aim.top {
+    border: 2px solid #ff6b6b;
+    font-weight: bold;
+}
+
+.result-sum.spd {
+    background: rgba(155, 89, 182, 0.3);
+}
+
+.result-sum.spd.top {
+    border: 2px solid #9b59b6;
+    font-weight: bold;
+}
+
+.result-sum.acc {
+    background: rgba(46, 204, 113, 0.3);
+}
+
+.result-sum.acc.top {
+    border: 2px solid #2ecc71;
+    font-weight: bold;
 }
 
 .critical-hit {
