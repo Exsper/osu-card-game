@@ -16,8 +16,9 @@ class CardPool {
         // 实际osu玩家。只会分配到玩家理论卡池中，每条分配到之后应删除该条
         this.osuPlayers = (this.useRealPlayers) ? [
             { userId: 2360046, userName: 'Candy', mod: 'HD', aim: 4, spd: 2, acc: 7 },
-            { userId: 2, userName: 'peppy', mod: 'EZ', aim: 2, spd: 2, acc: 2 },
-            { userId: 3, userName: 'BanchoBot', mod: 'DT', aim: 2, spd: 7, acc: 2 },
+            { userId: 2, userName: 'peppy'},
+            { userId: 3, userName: 'BanchoBot'},
+            { userId: 33206685, userName: 'pqw9p'},
         ] : [];
 
         // 创建初始卡池
@@ -60,11 +61,12 @@ class CardPool {
                 // 从玩家卡牌列表中移除该玩家
                 this.osuPlayers.splice(playerIndex, 1);
                 // 创建玩家卡牌
+                const mods = ['HR', 'EZ', 'DT', 'HD'];
                 const card = new Card(startIndex + i + 1, {
-                    mod: player.mod,
-                    aim: player.aim,
-                    spd: player.spd,
-                    acc: player.acc
+                    mod: player.mod || mods[Math.floor(Math.random() * mods.length)],
+                    aim: player.aim || Math.floor(Math.random() * 9) + 1,
+                    spd: player.spd || Math.floor(Math.random() * 9) + 1,
+                    acc: player.acc || Math.floor(Math.random() * 9) + 1,
                 }, {
                     userId: player.userId,
                     userName: player.userName
