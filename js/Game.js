@@ -18,6 +18,39 @@ class Game {
         this.battleCount = 0;
         this.battle = null;
 
+        // 商店商品
+        this.shopItems = [
+            {
+                id: 'randomCard',
+                name: '随机卡牌',
+                description: '购买一张随机属性的卡牌',
+                price: 100,
+                type: 'randomCard'
+            },
+            {
+                id: 'highCard',
+                name: '高级卡牌',
+                description: '购买一张至少有一个高属性(7-10)的卡牌',
+                price: 200,
+                type: 'highCard'
+            },
+            {
+                id: 'modChangeTicket',
+                name: 'MOD转换券',
+                description: '随机改变一张卡牌的MOD',
+                price: 80,
+                type: 'modChangeTicket'
+            },
+            {
+                id: 'upgradeTicket',
+                name: '卡牌升级券',
+                description: '使一张卡牌的所有属性+1',
+                price: 150,
+                type: 'upgradeTicket'
+            }
+        ];
+        this.selectedShopItem = null;
+
         this.initUIReferences();
         this.bindEvents();
     }
@@ -47,6 +80,11 @@ class Game {
         this.skillSelectGroup = document.getElementById('skill-select-group');
         this.skillSelectBtns = Array.from(document.querySelectorAll('.skill-select-btn'));
 
+        // 商店元素
+        this.shopItemsEl = document.getElementById('shop-items');
+        this.shopGoldEl = document.getElementById('shop-gold');
+        this.buyBtn = document.getElementById('buy-btn');
+        this.shopHint = document.getElementById('shop-hint');
     }
 
     clearListeners() {
@@ -62,6 +100,7 @@ class Game {
             'skill-4-btn',
             'confirm-action-btn',
             'cancel-action-btn',
+            'buy-btn',
         ];
         btnIds.forEach(id => {
             const oldBtn = document.getElementById(id);
@@ -102,7 +141,6 @@ class Game {
     }
 
     // 卡牌管理界面
-
     renderCollection() {
         this.collectionContainer.innerHTML = '';
 
@@ -120,6 +158,7 @@ class Game {
     createCollectionCard(card) {
         const cardEl = document.createElement('div');
         cardEl.className = 'card';
+        cardEl.setAttribute('data-cardid', card.id);
 
         // 区分升级目标和素材
         if (this.selectedAction === 'upgrade' && this.selectedCards.length > 0) {
@@ -147,6 +186,11 @@ class Game {
      * @param {Card} card 
      */
     toggleCardSelection(card) {
+        // 移除之前可能存在的浮动按钮框
+        const existingActionBox = document.getElementById('card-action-box');
+        if (existingActionBox) {
+            existingActionBox.remove();
+        }
         if (this.selectedAction === 'discard') {
             // 出售卡牌 - 只需要选择一张
             if (this.selectedCards.length > 0 && this.selectedCards[0] === card.id) {
@@ -190,6 +234,76 @@ class Game {
             } else {
                 this.selectedCards = [card.id];
                 this.actionHint.textContent = `已选择卡牌: ${(this.useRealPlayers && card.userId > 0) ? card.userName : "ID: " + card.id}`;
+                // 如果只选择了一张卡牌，并且有可用的券，则显示浮动按钮框
+                if (this.selectedCards.length === 1 && (this.player.inventory.modChangeTicket > 0 || this.player.inventory.upgradeTicket > 0)) {
+                    const cardId = this.selectedCards[0];
+                    const selectedCard = this.cardPool.playerDeck.find(c => c.id === cardId);
+
+                    // 创建浮动按钮框
+                    const actionBox = document.createElement('div');
+                    actionBox.id = 'card-action-box';
+                    actionBox.className = 'card-action-box';
+
+                    // 添加使用MOD转换券按钮（如果有券可用）
+                    if (this.player.inventory.modChangeTicket > 0) {
+                        const modButton = document.createElement('button');
+                        modButton.className = 'action-btn';
+                        modButton.textContent = '使用MOD转换券';
+                        modButton.addEventListener('click', () => {
+                            if (this.player.useModChangeTicket(selectedCard)) {
+                                this.actionHint.textContent = `已对卡牌 ${selectedCard.id} 使用MOD转换券，新MOD: ${selectedCard.mod}`;
+                                this.renderCollection();
+                                this.updateStats();
+                                actionBox.remove(); // 使用后移除浮动框
+                            }
+                        });
+                        actionBox.appendChild(modButton);
+                    }
+
+                    // 添加使用升级券按钮（如果有券可用）
+                    if (this.player.inventory.upgradeTicket > 0) {
+                        const upgradeButton = document.createElement('button');
+                        upgradeButton.className = 'action-btn';
+                        upgradeButton.textContent = '使用升级券';
+                        upgradeButton.addEventListener('click', () => {
+                            if (this.player.useUpgradeTicket(selectedCard)) {
+                                this.actionHint.textContent = `已对卡牌 ${selectedCard.id} 使用升级券，属性已提升`;
+                                this.renderCollection();
+                                this.updateStats();
+                                actionBox.remove(); // 使用后移除浮动框
+                            }
+                        });
+                        actionBox.appendChild(upgradeButton);
+                    }
+
+                    // 添加取消按钮
+                    const cancelButton = document.createElement('button');
+                    cancelButton.className = 'action-btn';
+                    cancelButton.textContent = '取消';
+                    cancelButton.addEventListener('click', () => {
+                        actionBox.remove();
+                    });
+                    actionBox.appendChild(cancelButton);
+
+                    // 获取选中的卡牌元素并定位浮动框
+
+                    let collectionArea = document.querySelector('.collection-area');
+                    const cardElement = Array.from(this.collectionContainer.querySelectorAll('.card'))
+                        .find(el => el.getAttribute('data-cardid') == cardId);
+
+                    if (cardElement) {
+                        const rect = cardElement.getBoundingClientRect();
+                        const containerRect = collectionArea.getBoundingClientRect();
+
+                        actionBox.style.position = 'absolute';
+                        actionBox.style.top = `${rect.bottom - containerRect.top + rect.height / 2}px`;
+                        actionBox.style.left = `${rect.right}px`;
+                        
+
+                        // 将浮动框添加到集合区域
+                        collectionArea.appendChild(actionBox);
+                    }
+                }
             }
         }
 
@@ -236,6 +350,82 @@ class Game {
         this.battleCountEl.textContent = this.cardPool.progress + 1;
     }
 
+    // 渲染商店
+    renderShop() {
+        this.shopItemsEl.innerHTML = '';
+        this.shopGoldEl.textContent = this.player.gold;
+
+        // 更新物品栏数量显示
+        document.getElementById('mod-ticket-count').textContent = this.player.inventory.modChangeTicket;
+        document.getElementById('upgrade-ticket-count').textContent = this.player.inventory.upgradeTicket;
+
+        this.shopItems.forEach(item => {
+            const itemEl = document.createElement('div');
+            itemEl.className = 'shop-item';
+            if (this.selectedShopItem === item.id) {
+                itemEl.classList.add('selected');
+            }
+
+            itemEl.innerHTML = `
+                <div class="shop-item-name">${item.name}</div>
+                <div class="shop-item-desc">${item.description}</div>
+                <div class="shop-item-price">价格: ${item.price}G</div>
+            `;
+
+            itemEl.addEventListener('click', () => {
+                this.selectedShopItem = item.id;
+                this.shopHint.textContent = `已选择: ${item.name}`;
+                this.renderShop();
+            });
+
+            this.shopItemsEl.appendChild(itemEl);
+        });
+    }
+
+    // 购买选中的商品
+    buySelectedItem() {
+        if (!this.selectedShopItem) {
+            this.shopHint.textContent = "请先选择要购买的商品";
+            return;
+        }
+
+        const item = this.shopItems.find(i => i.id === this.selectedShopItem);
+        if (!item) return;
+
+        // 购买随机卡牌或高级卡牌
+        if (item.type === 'randomCard' || item.type === 'highCard') {
+            if (this.player.buyItem(item.type, item.price)) {
+                // 创建新卡牌
+                const newCard = new Card(this.cardPool.deckLength + 1);
+                if (item.type === 'highCard') {
+                    // 确保至少有一个高属性
+                    const attributes = ['aim', 'spd', 'acc'];
+                    const highAttr = attributes[Math.floor(Math.random() * 3)];
+                    newCard[highAttr] = Math.floor(Math.random() * 3) + 8;
+                }
+
+                // 添加到玩家卡池
+                this.cardPool.playerDeck.push(newCard);
+                this.cardPool.deckLength += 1;
+
+                this.shopHint.textContent = `成功购买 ${item.name}！新卡牌已添加到你的收藏。`;
+                this.renderCollection();
+                this.updateStats();
+            } else {
+                this.shopHint.textContent = "金币不足，无法购买！";
+            }
+        }
+        // 购买券类物品
+        else {
+            if (this.player.buyItem(item.type, item.price)) {
+                this.shopHint.textContent = `成功购买 ${item.name}！可在卡牌管理界面使用。`;
+            } else {
+                this.shopHint.textContent = "金币不足，无法购买！";
+            }
+        }
+
+        this.renderShop();
+    }
 
     showRewardScreen() {
         // 生成3张奖励卡牌
@@ -267,6 +457,7 @@ class Game {
 
             // 更新UI
             this.renderCollection();
+            this.renderShop();
             this.updateStats();
 
             this.gameState = 'collection';
@@ -443,5 +634,8 @@ class Game {
             this.cardPool.createMoreDeck();
             this.startBattle();
         });
+
+        // 商店购买按钮
+        this.buyBtn.addEventListener('click', () => this.buySelectedItem());
     }
 }

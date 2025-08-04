@@ -22,7 +22,7 @@
 
         <div id="collection-shop-switch" class="tabs hide">
             <button class="tab-btn active" data-tab="collection">卡牌管理</button>
-            <button class="tab-btn" data-tab="shop">商店（未实装）</button>
+            <button class="tab-btn" data-tab="shop">商店</button>
         </div>
 
         <!-- 卡牌养成界面 -->
@@ -88,7 +88,22 @@
         <div id="shop-tab" class="tab-content">
             <div class="shop-area">
                 <h2 class="shop-title">商店</h2>
-                <!-- TODO -->
+                <div class="shop-gold">金币: <span id="shop-gold">100</span>G</div>
+
+                <!-- 物品栏显示 -->
+                <div class="inventory">
+                    <h3>我的物品栏</h3>
+                    <div>MOD转换券: <span id="mod-ticket-count">0</span></div>
+                    <div>升级券: <span id="upgrade-ticket-count">0</span></div>
+                </div>
+
+                <div class="shop-items" id="shop-items">
+                    <!-- 商品将通过JS动态生成 -->
+                </div>
+                <div class="shop-hint" id="shop-hint">请选择要购买的商品</div>
+                <div style="text-align:center; margin-top:20px;">
+                    <button class="action-btn" id="buy-btn">购买</button>
+                </div>
             </div>
         </div>
 
@@ -234,7 +249,7 @@
             </ul>
             <h3>下一步计划</h3>
             <ul>
-                <li>商店和金币系统</li>
+                <li>完善整体系统</li>
                 <li>将更多现实玩家作为彩蛋加入卡组，欢迎<a href="https://bbs.hiosu.com/thread-1325-1-1.html"
                         target="_blank">报名</a>，提供osuId、aim、spd、acc和擅长mod</li>
                 <li>欢迎提出任何<a href="https://github.com/Exsper/osu-card-game/issues" target="_blank">意见和建议</a></li>

@@ -8,6 +8,11 @@ class Player {
             redraw: 1,
             steal: 1
         };
+        // 物品栏
+        this.inventory = {
+            modChangeTicket: 0,
+            upgradeTicket: 0
+        };
     }
 
     /**
@@ -128,6 +133,51 @@ class Player {
     spendGold(amount) {
         if (this.gold < amount) return false;
         this.gold -= amount;
+        return true;
+    }
+
+    // 购买物品
+    buyItem(itemType, price) {
+        if (this.gold < price) {
+            return false;
+        }
+        this.gold -= price;
+
+        switch (itemType) {
+            case 'randomCard':
+            case 'highCard':
+                // 这些卡牌会在商店购买后直接添加到卡池
+                break;
+            case 'modChangeTicket':
+                this.inventory.modChangeTicket += 1;
+                break;
+            case 'upgradeTicket':
+                this.inventory.upgradeTicket += 1;
+                break;
+        }
+        return true;
+    }
+
+    // 使用MOD转换券
+    useModChangeTicket(card) {
+        if (this.inventory.modChangeTicket <= 0) return false;
+
+        let mods = ['HR', 'EZ', 'DT', 'HD'];
+        mods = mods.filter((mod) => mod !== card.mod);
+        const newMod = mods[Math.floor(Math.random() * mods.length)];
+        card.mod = newMod;
+        this.inventory.modChangeTicket -= 1;
+        return true;
+    }
+
+    // 使用升级券
+    useUpgradeTicket(card) {
+        if (this.inventory.upgradeTicket <= 0) return false;
+
+        card.aim = Math.min(10, card.aim + 1);
+        card.spd = Math.min(10, card.spd + 1);
+        card.acc = Math.min(10, card.acc + 1);
+        this.inventory.upgradeTicket -= 1;
         return true;
     }
 }

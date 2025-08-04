@@ -1158,3 +1158,126 @@ button:disabled {
     transform: translateY(-3px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
+
+.shop-area {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+}
+
+.shop-title {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #feca57;
+    font-size: 1.8rem;
+}
+
+.shop-gold {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    background: rgba(254, 202, 87, 0.2);
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.shop-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.shop-item {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.shop-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-5px);
+}
+
+.shop-item.selected {
+    border: 2px solid #feca57;
+    box-shadow: 0 0 15px #feca57;
+}
+
+.shop-item-name {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #48dbfb;
+    margin-bottom: 10px;
+}
+
+.shop-item-desc {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.shop-item-price {
+    font-weight: bold;
+    color: #feca57;
+    text-align: right;
+}
+
+.shop-hint {
+    text-align: center;
+    margin-top: 20px;
+    color: #feca57;
+    font-style: italic;
+    min-height: 24px;
+}
+
+.inventory {
+    display: flex;
+    justify-content: space-around;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.card-action-box {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: rgba(0, 0, 0, 0.9);
+    padding: 10px;
+    border-radius: 8px;
+    z-index: 100;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    min-width: 150px;
+}
+
+.card-action-box .action-btn {
+    padding: 5px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.inventory {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.inventory h3 {
+    margin-bottom: 10px;
+    color: #feca57;
+}
+
+.inventory div {
+    margin: 5px 0;
+    font-size: 1.1rem;
+}
